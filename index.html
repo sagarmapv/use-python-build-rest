@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>REST APIs — From Python to 5G to AI</title>
+<title>REST APIs — The Offer Letter</title>
 <style>
 :root {
   --bg: #0a0f1e;
@@ -14,1009 +14,403 @@
   --muted: #64748b;
   --blue: #38bdf8;
   --green: #34d399;
-  --orange: #fb923c;
   --purple: #c084fc;
-  --red: #f87171;
   --yellow: #fbbf24;
+  --red: #f87171;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
 
 /* NAV */
 nav {
+  display: flex; align-items: center; gap: 28px; padding: 0 40px; height: 52px;
+  background: rgba(10,15,30,.95); border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 100;
-  background: rgba(10,15,30,.92); backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 32px; padding: 0 40px; height: 52px;
 }
-.nav-brand { font-weight: 700; font-size: .95rem; color: var(--blue); letter-spacing: -.01em; }
-nav a { font-size: .82rem; color: var(--muted); text-decoration: none; transition: color .15s; }
+.nav-brand { font-weight: 800; font-size: .95rem; color: var(--blue); }
+nav a { font-size: .82rem; color: var(--muted); text-decoration: none; }
 nav a:hover { color: var(--text); }
+.nav-cta {
+  margin-left: auto; padding: 7px 18px; background: var(--blue); color: #0a0f1e;
+  border-radius: 99px; font-size: .8rem; font-weight: 700; text-decoration: none;
+  transition: opacity .15s;
+}
+.nav-cta:hover { opacity: .85; color: #0a0f1e; }
 
 /* HERO */
 .hero {
-  text-align: center; padding: 80px 24px 60px;
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, #0c2a4a, transparent);
+  min-height: 88vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px;
+  background: radial-gradient(ellipse 100% 60% at 50% 0%, #0c2240, transparent 70%);
+  position: relative; overflow: hidden;
 }
-.hero-tag {
-  display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 110%, #1a0a3a, transparent 70%);
+  pointer-events: none;
+}
+.tag {
+  display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: var(--blue); background: #0c2a4a;
-  border: 1px solid #1e4a7a; border-radius: 99px; padding: 4px 14px; margin-bottom: 20px;
+  border: 1px solid #1e4a7a; border-radius: 99px; padding: 4px 14px; margin-bottom: 24px;
 }
-.hero h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
-.hero h1 em { font-style: normal; color: var(--blue); }
-.hero p { font-size: 1.05rem; color: var(--muted); max-width: 560px; margin: 0 auto 40px; }
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 3.6rem); font-weight: 900; line-height: 1.1;
+  letter-spacing: -.02em; margin-bottom: 20px; max-width: 700px;
+}
+.hero h1 .accent { color: var(--blue); }
+.hero h1 .accent2 { color: var(--green); }
+.hero p {
+  font-size: clamp(.95rem, 2vw, 1.15rem); color: var(--muted);
+  max-width: 520px; margin: 0 auto 44px;
+}
 
-/* DIAGRAM */
-.diagram {
-  display: flex; align-items: center; justify-content: center; gap: 0;
-  max-width: 780px; margin: 0 auto 20px; flex-wrap: wrap; gap: 8px;
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 32px; background: var(--blue); color: #0a0f1e;
+  border-radius: 99px; font-size: 1rem; font-weight: 800;
+  text-decoration: none; transition: transform .15s, opacity .15s;
+  box-shadow: 0 0 40px #38bdf840;
 }
-.diag-box {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-  padding: 16px 22px; text-align: center; min-width: 130px;
-}
-.diag-box .icon { font-size: 1.6rem; margin-bottom: 6px; }
-.diag-box .label { font-size: .78rem; font-weight: 600; color: var(--text); }
-.diag-box .sub { font-size: .68rem; color: var(--muted); margin-top: 2px; }
-.diag-arrow {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  font-size: .65rem; color: var(--muted); padding: 0 4px;
-}
-.diag-arrow .line {
-  width: 60px; height: 1px; background: linear-gradient(90deg, var(--blue), var(--purple));
-  position: relative;
-}
-.diag-arrow .verb-pill {
-  font-size: .62rem; font-weight: 700; padding: 1px 7px; border-radius: 99px;
-  background: var(--surface2); border: 1px solid var(--border);
-}
-.POST-p  { color: var(--green); }
-.GET-p   { color: var(--blue); }
-.PUT-p   { color: var(--orange); }
-.PATCH-p { color: var(--purple); }
-.DEL-p   { color: var(--red); }
+.hero-cta:hover { transform: translateY(-2px); opacity: .9; }
+.hero-cta .arrow { font-size: 1.1rem; }
 
-/* SECTION */
-section { max-width: 1000px; margin: 0 auto; padding: 60px 24px; }
+/* SCROLL HINT */
+.scroll-hint {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  font-size: .72rem; color: var(--muted); display: flex; flex-direction: column;
+  align-items: center; gap: 6px; animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+/* CAST SECTION */
+.cast-section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
 .section-label {
   font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--blue); margin-bottom: 10px;
 }
-.section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
-.section-sub { color: var(--muted); margin-bottom: 36px; font-size: .95rem; }
-hr.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+.section-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; margin-bottom: 10px; }
+.section-sub { color: var(--muted); font-size: .95rem; margin-bottom: 48px; max-width: 560px; }
 
-/* CONCEPT CARDS */
-.concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 14px; margin-bottom: 40px; }
-.concept-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px;
-  transition: border-color .15s;
-}
-.concept-card:hover { border-color: var(--blue); }
-.verb-badge {
-  display: inline-block; font-size: .68rem; font-weight: 700; padding: 3px 9px;
-  border-radius: 4px; margin-bottom: 10px;
-}
-.POST-b  { background: #064e3b44; color: var(--green);  border: 1px solid #064e3b; }
-.GET-b   { background: #1e3a5f44; color: var(--blue);   border: 1px solid #1e3a5f; }
-.PUT-b   { background: #451a0344; color: var(--orange); border: 1px solid #451a03; }
-.PATCH-b { background: #2e106544; color: var(--purple); border: 1px solid #2e1065; }
-.DEL-b   { background: #450a0a44; color: var(--red);    border: 1px solid #450a0a; }
-.concept-card h3 { font-size: .88rem; font-weight: 600; margin-bottom: 4px; }
-.concept-card p  { font-size: .78rem; color: var(--muted); line-height: 1.5; }
-
-/* SANDBOX */
-.sandbox-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media(max-width:700px) { .sandbox-layout { grid-template-columns: 1fr; } }
-
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-.panel-head {
-  padding: 12px 18px; background: var(--bg); border-bottom: 1px solid var(--border);
-  font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.panel-body { padding: 16px 18px; }
-
-.verb-block { border-bottom: 1px solid var(--border); }
-.verb-row {
-  display: flex; align-items: center; gap: 10px; padding: 11px 18px;
-  cursor: pointer; transition: background .12s;
-}
-.verb-row:hover { background: var(--bg); }
-.verb-row .endpoint { font-size: .82rem; font-family: monospace; color: #cbd5e1; }
-.verb-row .arrow { margin-left: auto; color: var(--muted); font-size: .75rem; }
-
-.verb-form { display: none; padding: 14px 18px; background: #070c19; border-top: 1px solid var(--border); }
-.verb-form.open { display: block; }
-.verb-form label { display: block; font-size: .72rem; color: var(--muted); margin: 10px 0 4px; }
-.verb-form label:first-child { margin-top: 0; }
-.verb-form input {
-  width: 100%; padding: 7px 10px; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--text); font-size: .82rem;
-}
-.verb-form input:focus { outline: none; border-color: var(--blue); }
-.btn-send {
-  margin-top: 12px; padding: 7px 16px; background: #0284c7; color: #fff;
-  border: none; border-radius: 6px; cursor: pointer; font-size: .82rem; font-weight: 600;
-  transition: background .12s;
-}
-.btn-send:hover { background: #0369a1; }
-.btn-sm {
-  padding: 4px 10px; background: var(--surface2); border: 1px solid var(--border);
-  color: var(--muted); border-radius: 5px; cursor: pointer; font-size: .72rem;
-}
-.btn-sm:hover { background: var(--border); }
-
-pre.response-box {
-  background: #050a14; border: 1px solid #1e3a5f; border-radius: 7px;
-  padding: 14px; font-size: .78rem; color: #7dd3fc; white-space: pre-wrap;
-  word-break: break-all; min-height: 80px; max-height: 360px; overflow-y: auto;
-  font-family: 'Cascadia Code', 'Fira Code', monospace;
-}
-.status-tag {
-  font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-left: 8px;
-}
-.s2 { background: #064e3b; color: var(--green); }
-.s4 { background: #450a0a; color: var(--red); }
-.s0 { background: var(--surface2); color: var(--muted); }
-
-#store-list { list-style: none; }
-#store-list li {
-  padding: 10px 12px; background: #050a14; border: 1px solid #1e3a5f;
-  border-radius: 6px; margin-bottom: 8px; font-size: .76rem; font-family: monospace;
-}
-#store-list .iid { color: var(--muted); font-size: .68rem; display: block; margin-bottom: 2px; }
-#store-list .iname { color: var(--blue); font-weight: 600; }
-#store-list .iprice { float: right; color: var(--green); }
-#store-list .idesc { color: var(--muted); font-size: .72rem; }
-.empty-msg { color: var(--muted); font-style: italic; font-size: .82rem; }
-
-/* EXPLAINER — 3 worlds */
-.worlds-wrap { margin-top: 36px; }
-.worlds-trigger {
-  background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
-  padding: 16px 20px; margin-bottom: 16px; cursor: default;
-  font-size: .82rem; color: var(--muted);
-}
-.worlds-trigger strong { color: var(--text); }
-.worlds-trigger .verb-inline {
-  display: inline-block; font-size: .68rem; font-weight: 700; padding: 1px 7px;
-  border-radius: 4px; margin-right: 6px;
+.cast-grid { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; }
+@media(max-width:700px) {
+  .cast-grid { grid-template-columns: 1fr; gap: 16px; }
+  .cast-connector { display: none; }
 }
 
-.worlds-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-@media(max-width:700px) { .worlds-grid { grid-template-columns: 1fr; } }
+.cast-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 28px 24px; text-align: center;
+  transition: border-color .2s, transform .2s;
+}
+.cast-card:hover { border-color: var(--blue); transform: translateY(-3px); }
 
-.world-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+.cast-emoji { font-size: 2.4rem; margin-bottom: 14px; }
+.cast-role {
+  font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
 }
-.world-head {
-  padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start;
-}
-.world-icon { font-size: 1.3rem; }
-.world-title { font-size: .82rem; font-weight: 700; }
-.world-sub   { font-size: .7rem; color: var(--muted); margin-top: 1px; }
-.world-body  { padding: 14px 16px; }
-pre.code-snip {
-  background: #050a14; border: 1px solid var(--border); border-radius: 6px;
-  padding: 12px; font-size: .72rem; color: #bae6fd; white-space: pre-wrap;
-  word-break: break-all; overflow-x: auto; margin-top: 10px; line-height: 1.7;
-  font-family: 'Cascadia Code', 'Fira Code', monospace;
-}
-.code-label { font-size: .65rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
-.highlight-line { color: var(--yellow); }
-.comment-line { color: #475569; }
+.cast-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+.cast-name.blue { color: var(--blue); }
+.cast-name.green { color: var(--green); }
+.cast-name.purple { color: var(--purple); }
+.cast-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; }
 
-/* WORLDS TABS */
-.worlds-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.wtab {
-  padding: 7px 16px; border-radius: 99px; border: 1px solid var(--border);
-  background: var(--surface2); color: var(--muted); font-size: .78rem; cursor: pointer;
-  transition: all .12s;
+.cast-connector {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 0 12px;
 }
-.wtab.active { background: #0c2a4a; border-color: var(--blue); color: var(--blue); font-weight: 600; }
-.worlds-panel { display: none; }
-.worlds-panel.active { display: block; }
+.conn-line { width: 48px; height: 1px; background: linear-gradient(90deg, var(--border), var(--blue), var(--border)); }
+.conn-label { font-size: .62rem; color: var(--muted); white-space: nowrap; }
 
-/* BUILD IT */
-.steps { counter-reset: step; }
-.step {
-  display: flex; gap: 18px; margin-bottom: 24px;
-  counter-increment: step;
+/* STORY SECTION */
+.story-section {
+  background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 80px 24px;
 }
-.step-num {
-  flex-shrink: 0; width: 32px; height: 32px; background: #0c2a4a;
-  border: 1px solid var(--blue); border-radius: 50%;
+.story-inner { max-width: 900px; margin: 0 auto; }
+.story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+@media(max-width:660px) { .story-grid { grid-template-columns: 1fr; } }
+
+.story-text h2 { font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 800; margin-bottom: 14px; line-height: 1.3; }
+.story-text p { color: var(--muted); font-size: .92rem; line-height: 1.8; margin-bottom: 12px; }
+.story-text p strong { color: var(--text); }
+
+.offer-card {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 24px; position: relative;
+}
+.offer-card::before {
+  content: 'OFFER LETTER'; position: absolute; top: -11px; left: 20px;
+  font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+  background: var(--bg); padding: 0 8px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px;
+}
+.offer-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.offer-row:last-child { border: none; }
+.offer-key { font-size: .78rem; color: var(--muted); }
+.offer-val { font-size: .82rem; font-weight: 600; font-family: monospace; }
+.offer-val.pending { color: var(--yellow); }
+.offer-val.green { color: var(--green); }
+
+/* VERBS PREVIEW */
+.verbs-section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
+.verbs-timeline { position: relative; }
+.verbs-timeline::before {
+  content: ''; position: absolute; left: 28px; top: 20px; bottom: 20px;
+  width: 2px; background: linear-gradient(180deg, var(--blue), var(--purple), var(--green));
+}
+.verb-item { display: flex; gap: 20px; margin-bottom: 28px; align-items: flex-start; }
+.verb-dot {
+  flex-shrink: 0; width: 58px; height: 58px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: .8rem; font-weight: 700; color: var(--blue);
+  font-size: .65rem; font-weight: 800; letter-spacing: .05em;
+  border: 2px solid; z-index: 1; position: relative;
 }
-.step-body h3 { font-size: .88rem; font-weight: 600; margin-bottom: 6px; }
-.step-body p  { font-size: .82rem; color: var(--muted); margin-bottom: 8px; }
-pre.cmd {
-  background: #050a14; border: 1px solid var(--border); border-left: 3px solid var(--blue);
-  border-radius: 6px; padding: 12px 14px; font-size: .8rem; color: var(--green);
-  font-family: 'Cascadia Code','Fira Code',monospace; white-space: pre-wrap;
+.dot-post   { background: #064e3b33; border-color: #34d399; color: #34d399; }
+.dot-get    { background: #1e3a5f33; border-color: #38bdf8; color: #38bdf8; }
+.dot-put    { background: #451a0333; border-color: #fb923c; color: #fb923c; }
+.dot-patch  { background: #2e106533; border-color: #c084fc; color: #c084fc; }
+.dot-delete { background: #450a0a33; border-color: #f87171; color: #f87171; }
+.dot-hire   { background: #14532d33; border-color: #4ade80; color: #4ade80; }
+
+.verb-content { padding-top: 8px; }
+.verb-content h3 { font-size: .95rem; font-weight: 700; margin-bottom: 4px; }
+.verb-content p { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+.verb-content .quote {
+  margin-top: 8px; padding: 8px 14px; background: var(--surface2); border-left: 3px solid var(--border);
+  border-radius: 0 6px 6px 0; font-size: .8rem; font-style: italic; color: var(--muted);
 }
 
-/* FOOTER */
+/* CTA SECTION */
+.cta-section {
+  text-align: center; padding: 100px 24px;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, #0c2240, transparent);
+}
+.cta-section h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 900; margin-bottom: 14px; letter-spacing: -.02em; }
+.cta-section p { color: var(--muted); font-size: .95rem; margin-bottom: 36px; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 36px; background: var(--blue); color: #0a0f1e;
+  border-radius: 99px; font-size: 1.05rem; font-weight: 800;
+  text-decoration: none; transition: transform .15s;
+  box-shadow: 0 0 60px #38bdf850;
+}
+.cta-btn:hover { transform: translateY(-2px); }
+.cta-docs { display: block; margin-top: 18px; font-size: .8rem; color: var(--muted); text-decoration: none; }
+.cta-docs:hover { color: var(--text); }
+
 footer {
-  text-align: center; padding: 40px 24px; border-top: 1px solid var(--border);
-  font-size: .78rem; color: var(--muted);
+  text-align: center; padding: 32px 24px; border-top: 1px solid var(--border);
+  font-size: .75rem; color: var(--muted);
 }
 footer a { color: var(--blue); text-decoration: none; }
-
-/* Utility */
-.mt8  { margin-top: 8px; }
-.mt16 { margin-top: 16px; }
-.flex-between { display: flex; align-items: center; justify-content: space-between; }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <span class="nav-brand">REST APIs</span>
-  <a href="#concepts">Concepts</a>
-  <a href="#sandbox">Sandbox</a>
-  <a href="#three-worlds">3 Worlds</a>
-  <a href="#build">Build It</a>
+  <a href="journey.html">Negotiate</a>
+  <a href="docs.html">Docs</a>
+  <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub</a>
+  <a class="nav-cta" href="journey.html">Start negotiating →</a>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">AI-For-All · Education wing</div>
-  <h1>REST is how everything<br>talks to <em>everything</em></h1>
-  <p>Your Python server. A 5G Network Function. The Claude AI API.<br>
-     Same 5 verbs. Different payload. Try it live — no install needed.</p>
+  <div class="tag">AI-For-All · Education wing</div>
+  <h1>
+    You got an offer.<br>
+    <span class="accent">Time to negotiate.</span><br>
+    <span style="font-size:60%;color:var(--muted);font-weight:400">This is how REST APIs work.</span>
+  </h1>
+  <p>
+    Every negotiation between you and HR is a REST API call.
+    Same rules. Same 5 verbs. Whether it's a job offer, a 5G network, or an AI model.
+  </p>
+  <a class="hero-cta" href="journey.html">
+    Open the offer letter <span class="arrow">→</span>
+  </a>
+  <div class="scroll-hint">
+    <span>scroll to understand</span>
+    <span>↓</span>
+  </div>
+</div>
 
-  <div class="diagram">
-    <div class="diag-box">
-      <div class="icon">🌐</div>
-      <div class="label">Client</div>
-      <div class="sub">browser · mobile · NF · script</div>
+<!-- CAST -->
+<section class="cast-section">
+  <div class="section-label">The cast</div>
+  <div class="section-title">Three players. One negotiation.</div>
+  <div class="section-sub">Before we write a single line of code, meet the three entities in every REST API interaction.</div>
+
+  <div class="cast-grid">
+    <div class="cast-card">
+      <div class="cast-emoji">💼</div>
+      <div class="cast-role">The Client</div>
+      <div class="cast-name blue">You — the Candidate</div>
+      <div class="cast-desc">
+        You initiate every conversation. You send demands, check the current offer, update your terms, and finally — accept.
+        In code, the client is your browser, app, or script.
+      </div>
     </div>
-    <div class="diag-arrow">
-      <div class="verb-pill POST-p">POST</div>
-      <div class="line"></div>
-      <div class="verb-pill GET-p">GET</div>
-      <div class="line"></div>
-      <div class="verb-pill PUT-p">PUT</div>
-      <div class="line"></div>
-      <div class="verb-pill PATCH-p">PATCH</div>
-      <div class="line"></div>
-      <div class="verb-pill DEL-p">DELETE</div>
+
+    <div class="cast-connector">
+      <div class="conn-line"></div>
+      <div class="conn-label">HTTP requests</div>
+      <div class="conn-line"></div>
     </div>
-    <div class="diag-box">
-      <div class="icon">⚡</div>
-      <div class="label">Server</div>
-      <div class="sub">FastAPI · 5G NF · Anthropic</div>
+
+    <div class="cast-card">
+      <div class="cast-emoji">🏢</div>
+      <div class="cast-role">The Server</div>
+      <div class="cast-name green">HR Portal</div>
+      <div class="cast-desc">
+        HR receives your requests, validates them, acts on them, and sends a response.
+        In code, the server is FastAPI, Express, Django — anything that listens for HTTP.
+      </div>
     </div>
-    <div class="diag-arrow">
-      <div class="line"></div>
-      <div style="font-size:.62rem;color:var(--muted)">reads / writes</div>
-      <div class="line"></div>
+
+    <div class="cast-connector">
+      <div class="conn-line"></div>
+      <div class="conn-label">reads / writes</div>
+      <div class="conn-line"></div>
     </div>
-    <div class="diag-box">
-      <div class="icon">🗄️</div>
-      <div class="label">Store</div>
-      <div class="sub">dict · DB · context window</div>
+
+    <div class="cast-card">
+      <div class="cast-emoji">📄</div>
+      <div class="cast-role">The Store</div>
+      <div class="cast-name purple">The Offer Letter</div>
+      <div class="cast-desc">
+        The current state of negotiations lives here. HR reads from it and writes to it on your behalf.
+        In code, it's a database — or in our case, a plain Python <code style="color:var(--purple)">dict</code>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<div class="story-section">
+  <div class="story-inner">
+    <div class="story-grid">
+      <div class="story-text">
+        <h2>The offer lands.<br>You want better terms.</h2>
+        <p>
+          HR sends you an offer. <strong>₹14L salary. 2 days WFH. No joining bonus.</strong>
+          You open the letter and think — I can do better.
+        </p>
+        <p>
+          So you pick up your laptop (the <strong>client</strong>), type your counter-offer,
+          and send it to the <strong>HR Portal</strong> (the server).
+          HR logs it in their system (the <strong>store</strong>) and sends you a response.
+        </p>
+        <p>
+          That exchange — request, process, respond — is a <strong>REST API call</strong>.
+          Every back-and-forth in your negotiation maps to one of 5 HTTP verbs.
+        </p>
+      </div>
+      <div>
+        <div class="offer-card">
+          <div class="offer-row">
+            <span class="offer-key">Role</span>
+            <span class="offer-val green">Senior Engineer</span>
+          </div>
+          <div class="offer-row">
+            <span class="offer-key">Base salary</span>
+            <span class="offer-val pending">₹14,00,000 ← you want ₹18L</span>
+          </div>
+          <div class="offer-row">
+            <span class="offer-key">WFH days / week</span>
+            <span class="offer-val pending">2 ← you want 4</span>
+          </div>
+          <div class="offer-row">
+            <span class="offer-key">Joining bonus</span>
+            <span class="offer-val pending">₹0 ← you want ₹1L</span>
+          </div>
+          <div class="offer-row">
+            <span class="offer-key">Status</span>
+            <span class="offer-val" style="color:var(--yellow)">⏳ negotiating</span>
+          </div>
+        </div>
+        <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:12px">
+          This is the current state in the store. Every request you send changes it.
+        </p>
+      </div>
     </div>
   </div>
 </div>
 
-<hr class="divider">
+<!-- VERBS PREVIEW -->
+<section class="verbs-section">
+  <div class="section-label">The story in 5 verbs</div>
+  <div class="section-title">Every negotiation move is an HTTP verb</div>
+  <div class="section-sub" style="margin-bottom:44px">You'll use each one in the interactive journey. Here's the plot.</div>
 
-<!-- CONCEPTS -->
-<section id="concepts">
-  <div class="section-label">Step 1</div>
-  <div class="section-title">The 5 verbs — and what they mean</div>
-  <div class="section-sub">Every REST API in the world is built from these 5 operations. Learn them once, use them everywhere.</div>
-
-  <div class="concept-grid">
-    <div class="concept-card">
-      <div class="verb-badge POST-b">POST</div>
-      <h3>Create</h3>
-      <p>Send data to the server to create a new resource. The server assigns it an ID and stores it.</p>
-    </div>
-    <div class="concept-card">
-      <div class="verb-badge GET-b">GET</div>
-      <h3>Read</h3>
-      <p>Fetch a resource by ID — or list all resources. Never changes server state. Safe to repeat.</p>
-    </div>
-    <div class="concept-card">
-      <div class="verb-badge PUT-b">PUT</div>
-      <h3>Replace</h3>
-      <p>Send a complete new version of a resource. The old version is fully overwritten.</p>
-    </div>
-    <div class="concept-card">
-      <div class="verb-badge PATCH-b">PATCH</div>
-      <h3>Update</h3>
-      <p>Send only the fields that changed. The server merges your patch into the existing resource.</p>
-    </div>
-    <div class="concept-card">
-      <div class="verb-badge DEL-b">DELETE</div>
-      <h3>Remove</h3>
-      <p>Tell the server to remove a resource by ID. Usually returns 204 — no body, just confirmation.</p>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- SANDBOX -->
-<section id="sandbox">
-  <div class="section-label">Step 2 — Interactive</div>
-  <div class="section-title">Live sandbox</div>
-  <div class="section-sub">A real server running in your browser. Same Python dict logic — no install needed. Fire a verb, watch the store update.</div>
-
-  <div class="sandbox-layout">
-    <!-- Left: verb forms -->
-    <div class="panel">
-      <div class="panel-head">Send a request</div>
-
-      <!-- POST -->
-      <div class="verb-block">
-        <div class="verb-row" onclick="toggle('f-post')">
-          <span class="verb-badge POST-b">POST</span>
-          <span class="endpoint">/items</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="verb-form" id="f-post">
-          <label>Name</label>
-          <input id="p-name" type="text" placeholder="Widget A">
-          <label>Description (optional)</label>
-          <input id="p-desc" type="text" placeholder="A fine widget">
-          <label>Price</label>
-          <input id="p-price" type="number" placeholder="9.99" step="0.01">
-          <button class="btn-send" onclick="sbPost()">Send POST</button>
-        </div>
-      </div>
-
-      <!-- GET all -->
-      <div class="verb-block">
-        <div class="verb-row" onclick="sbGetAll()">
-          <span class="verb-badge GET-b">GET</span>
-          <span class="endpoint">/items</span>
-          <span style="margin-left:auto;font-size:.72rem;color:var(--muted)">click to fire →</span>
-        </div>
-      </div>
-
-      <!-- GET one -->
-      <div class="verb-block">
-        <div class="verb-row" onclick="toggle('f-get')">
-          <span class="verb-badge GET-b">GET</span>
-          <span class="endpoint">/items/{id}</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="verb-form" id="f-get">
-          <label>Item ID</label>
-          <input id="g-id" type="text" placeholder="paste an id from the store →">
-          <button class="btn-send" onclick="sbGet()">Send GET</button>
-        </div>
-      </div>
-
-      <!-- PUT -->
-      <div class="verb-block">
-        <div class="verb-row" onclick="toggle('f-put')">
-          <span class="verb-badge PUT-b">PUT</span>
-          <span class="endpoint">/items/{id}</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="verb-form" id="f-put">
-          <label>Item ID</label>
-          <input id="put-id" type="text" placeholder="id to replace">
-          <label>Name</label>
-          <input id="put-name" type="text" placeholder="New name">
-          <label>Description</label>
-          <input id="put-desc" type="text">
-          <label>Price</label>
-          <input id="put-price" type="number" step="0.01">
-          <button class="btn-send" onclick="sbPut()">Send PUT</button>
-        </div>
-      </div>
-
-      <!-- PATCH -->
-      <div class="verb-block">
-        <div class="verb-row" onclick="toggle('f-patch')">
-          <span class="verb-badge PATCH-b">PATCH</span>
-          <span class="endpoint">/items/{id}</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="verb-form" id="f-patch">
-          <label>Item ID</label>
-          <input id="pa-id" type="text" placeholder="id to update">
-          <label>Name (blank = keep)</label>
-          <input id="pa-name" type="text">
-          <label>Description (blank = keep)</label>
-          <input id="pa-desc" type="text">
-          <label>Price (blank = keep)</label>
-          <input id="pa-price" type="number" step="0.01">
-          <button class="btn-send" onclick="sbPatch()">Send PATCH</button>
-        </div>
-      </div>
-
-      <!-- DELETE -->
-      <div class="verb-block" style="border:none">
-        <div class="verb-row" onclick="toggle('f-del')">
-          <span class="verb-badge DEL-b">DELETE</span>
-          <span class="endpoint">/items/{id}</span>
-          <span class="arrow">▾</span>
-        </div>
-        <div class="verb-form" id="f-del">
-          <label>Item ID</label>
-          <input id="d-id" type="text" placeholder="id to remove">
-          <button class="btn-send" onclick="sbDelete()">Send DELETE</button>
-        </div>
+  <div class="verbs-timeline">
+    <div class="verb-item">
+      <div class="verb-dot dot-post">POST</div>
+      <div class="verb-content">
+        <h3>Submit your counter-offer</h3>
+        <p>You send your terms to HR for the first time. A new negotiation record is created in the store.</p>
+        <div class="quote">"I'm looking for ₹18L base, 4 days WFH, and a ₹1L joining bonus."</div>
       </div>
     </div>
-
-    <!-- Right: response + store -->
-    <div style="display:flex;flex-direction:column;gap:16px;">
-      <div class="panel">
-        <div class="panel-head flex-between">
-          <span>Response <span id="s-tag" class="status-tag s0"></span></span>
-          <span id="last-action" style="font-size:.68rem;color:var(--muted)"></span>
-        </div>
-        <div class="panel-body">
-          <pre class="response-box" id="resp-box">← pick a verb and fire a request</pre>
-        </div>
+    <div class="verb-item">
+      <div class="verb-dot dot-get">GET</div>
+      <div class="verb-content">
+        <h3>Check what HR has on file</h3>
+        <p>You ask: "What are the current terms?" HR reads the store and tells you exactly what's recorded — nothing changes.</p>
+        <div class="quote">"What does your system show for my negotiation right now?"</div>
       </div>
-
-      <div class="panel">
-        <div class="panel-head flex-between">
-          <span>Store state <span style="font-size:.68rem;font-weight:400;color:var(--muted)">(your in-browser dict)</span></span>
-          <button class="btn-sm" onclick="renderStore()">↻</button>
-        </div>
-        <div class="panel-body">
-          <ul id="store-list"><li class="empty-msg">empty — create an item first</li></ul>
-        </div>
+    </div>
+    <div class="verb-item">
+      <div class="verb-dot dot-put">PUT</div>
+      <div class="verb-content">
+        <h3>Full renegotiation</h3>
+        <p>You've reconsidered everything. You send a completely new set of terms — the old record is fully replaced.</p>
+        <div class="quote">"Forget my last offer. Here are my new terms in full."</div>
       </div>
-
-      <div class="panel" id="explain-panel" style="display:none">
-        <div class="panel-head">What just happened?</div>
-        <div class="panel-body" id="explain-body" style="font-size:.82rem;line-height:1.7;color:var(--muted)"></div>
+    </div>
+    <div class="verb-item">
+      <div class="verb-dot dot-patch">PATCH</div>
+      <div class="verb-content">
+        <h3>Just one thing changed</h3>
+        <p>HR met you halfway on WFH. You only need to update the salary. Everything else stays exactly as it was.</p>
+        <div class="quote">"Keep everything the same — just bump the salary to ₹17L."</div>
+      </div>
+    </div>
+    <div class="verb-item">
+      <div class="verb-dot dot-delete">DELETE</div>
+      <div class="verb-content">
+        <h3>Negotiation closed — you accepted</h3>
+        <p>You've agreed on terms. The counter-offer record is removed from the store. Negotiation is over.</p>
+        <div class="quote">"I accept. You can close out the negotiation."</div>
+      </div>
+    </div>
+    <div class="verb-item">
+      <div class="verb-dot dot-hire" style="border-style:dashed">POST</div>
+      <div class="verb-content">
+        <h3 style="color:var(--green)">Welcome aboard — employee record created</h3>
+        <p>A brand new POST. The candidate row is gone. A fresh employee record is created. Same verb, new resource, new life chapter.</p>
+        <div class="quote" style="border-left-color:var(--green);color:var(--green)">"Candidate deleted. Employee #1042 onboarded. Welcome to the team."</div>
       </div>
     </div>
   </div>
 </section>
 
-<hr class="divider">
-
-<!-- THREE WORLDS -->
-<section id="three-worlds">
-  <div class="section-label">Step 3 — The big picture</div>
-  <div class="section-title">Same verb, three worlds</div>
-  <div class="section-sub">
-    REST is not just for web apps. A 5G core network is 20+ microservices calling each other over REST.<br>
-    An AI model call is a POST request. The verbs are identical — only the payload changes.
-  </div>
-
-  <div class="worlds-tabs">
-    <button class="wtab active" onclick="showWorld('post')">POST — Create</button>
-    <button class="wtab" onclick="showWorld('get')">GET — Read</button>
-    <button class="wtab" onclick="showWorld('put')">PUT — Replace</button>
-    <button class="wtab" onclick="showWorld('patch')">PATCH — Update</button>
-    <button class="wtab" onclick="showWorld('delete')">DELETE — Remove</button>
-  </div>
-
-  <!-- POST panel -->
-  <div class="worlds-panel active" id="wp-post">
-    <div class="worlds-grid">
-      <div class="world-card">
-        <div class="world-head">
-          <div class="world-icon">🐍</div>
-          <div>
-            <div class="world-title">Your Python server</div>
-            <div class="world-sub">FastAPI · this project</div>
-          </div>
-        </div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Create a new item. FastAPI validates the JSON against your Pydantic model, then stores it in the dict.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X POST http://127.0.0.1:8004/items \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Widget A",
-    "description": "A fine widget",
-    "price": 9.99
-  }'</pre>
-          <div class="code-label mt8">what the server does (main.py)</div>
-          <pre class="code-snip"><span class="comment-line"># store is just a dict</span>
-<span class="highlight-line">store[item_id] = {</span>
-<span class="highlight-line">  "id": item_id, **item.model_dump()</span>
-<span class="highlight-line">}</span>
-return store[item_id]  <span class="comment-line"># → 201</span></pre>
-        </div>
-      </div>
-
-      <div class="world-card">
-        <div class="world-head">
-          <div class="world-icon">📡</div>
-          <div>
-            <div class="world-title">5G Core Network</div>
-            <div class="world-sub">AMF → SMF via Nsmf SBI</div>
-          </div>
-        </div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">AMF asks SMF to create a PDU Session (your phone's data connection). Same verb — body carries 3GPP fields.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X POST \
-  http://smf/nsmf-pdusession/v1/sm-contexts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "supi": "imsi-001011234567890",
-    "pduSessionId": 1,
-    "dnn": "internet",
-    "sNssai": {"sst": 1, "sd": "000001"}
-  }'</pre>
-          <div class="code-label mt8">response</div>
-          <pre class="code-snip">{
-  "smContextRef": "http://smf/nsmf-pdusession/v1/sm-contexts/1",
-  "cause": "ACCEPTED"
-  <span class="comment-line">// HTTP 201 Created</span>
-}</pre>
-        </div>
-      </div>
-
-      <div class="world-card">
-        <div class="world-head">
-          <div class="world-icon">🤖</div>
-          <div>
-            <div class="world-title">Claude AI API</div>
-            <div class="world-sub">Anthropic · POST /messages</div>
-          </div>
-        </div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Every AI call is a POST. You send a conversation context; the server streams back a completion. Context window = the dict.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X POST \
-  https://api.anthropic.com/v1/messages \
-  -H "x-api-key: $ANTHROPIC_API_KEY" \
-  -H "anthropic-version: 2023-06-01" \
-  -d '{
-    "model": "claude-sonnet-4-6",
-    "max_tokens": 256,
-    "messages": [{
-      "role": "user",
-      "content": "Explain REST in one sentence"
-    }]
-  }'</pre>
-          <div class="code-label mt8">response shape</div>
-          <pre class="code-snip">{
-  "id": "msg_01...",
-  "type": "message",
-  "role": "assistant",
-  "content": [{"type":"text",
-    "text": "REST is a convention..."}]
-  <span class="comment-line">// HTTP 200 OK</span>
-}</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GET panel -->
-  <div class="worlds-panel" id="wp-get">
-    <div class="worlds-grid">
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🐍</div><div><div class="world-title">Your Python server</div><div class="world-sub">FastAPI · this project</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Look up one item by ID, or list everything in the store. Read-only — never changes state.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl http://127.0.0.1:8004/items
-<span class="comment-line"># or one item:</span>
-curl http://127.0.0.1:8004/items/a1b2c3d4</pre>
-          <div class="code-label mt8">main.py</div>
-          <pre class="code-snip"><span class="highlight-line">return store[item_id]</span>
-<span class="comment-line"># KeyError → 404 automatically</span></pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">📡</div><div><div class="world-title">5G Core Network</div><div class="world-sub">NRF subscription lookup</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Any NF can discover other NFs by querying the NRF (Network Repository Function) — a GET to find available SMF instances.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl \
-  "http://nrf/nnrf-disc/v1/nf-instances\
-?target-nf-type=SMF\
-&requester-nf-type=AMF"</pre>
-          <div class="code-label mt8">response</div>
-          <pre class="code-snip">{
-  "nfInstances": [{
-    "nfInstanceId": "smf-01",
-    "nfType": "SMF",
-    "ipv4Addresses": ["10.0.0.5"]
-  }]
-}</pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🤖</div><div><div class="world-title">Claude AI API</div><div class="world-sub">GET /models</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">GET requests are read-only even in AI APIs — list available models or check account limits without changing anything.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl https://api.anthropic.com/v1/models \
-  -H "x-api-key: $ANTHROPIC_API_KEY" \
-  -H "anthropic-version: 2023-06-01"</pre>
-          <div class="code-label mt8">response</div>
-          <pre class="code-snip">{
-  "data": [
-    {"id": "claude-sonnet-4-6",
-     "display_name": "Claude Sonnet 4.6"},
-    {"id": "claude-opus-4-8", ...}
-  ]
-}</pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PUT panel -->
-  <div class="worlds-panel" id="wp-put">
-    <div class="worlds-grid">
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🐍</div><div><div class="world-title">Your Python server</div><div class="world-sub">FastAPI · full replace</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">You must send ALL fields. Missing fields are removed. The whole dict entry is overwritten.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X PUT \
-  http://127.0.0.1:8004/items/a1b2c3d4 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Widget B",
-    "price": 14.99
-  }'</pre>
-          <div class="code-label mt8">main.py</div>
-          <pre class="code-snip"><span class="highlight-line">store[item_id] = {</span>
-<span class="highlight-line">  "id": item_id, **item.model_dump()</span>
-<span class="highlight-line">}</span>
-<span class="comment-line"># old entry fully replaced</span></pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">📡</div><div><div class="world-title">5G Core Network</div><div class="world-sub">NRF NF profile update</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">When an NF restarts or its IP changes, it PUT-s its full registration profile to the NRF, replacing the old record.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X PUT \
-  http://nrf/nnrf-nfm/v1/nf-instances/smf-01 \
-  -d '{
-    "nfInstanceId": "smf-01",
-    "nfType": "SMF",
-    "nfStatus": "REGISTERED",
-    "ipv4Addresses": ["10.0.0.6"]
-  }'</pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🤖</div><div><div class="world-title">AI API pattern</div><div class="world-sub">Stateless = implicit PUT</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">AI APIs are stateless — every POST /messages carries the full conversation history. Each call is effectively a PUT: you replace the entire context.</p>
-          <pre class="code-snip"><span class="comment-line"># You always send the FULL history:</span>
-"messages": [
-  {"role":"user",   "content":"Hi"},
-  {"role":"assistant","content":"Hello!"},
-  <span class="highlight-line">{"role":"user",   "content":"Now explain REST"}</span>
-]
-<span class="comment-line"># ↑ This IS a PUT pattern —
-# full state each request</span></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PATCH panel -->
-  <div class="worlds-panel" id="wp-patch">
-    <div class="worlds-grid">
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🐍</div><div><div class="world-title">Your Python server</div><div class="world-sub">FastAPI · dict merge</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Send only the fields that changed. The server merges: <code style="color:var(--blue)">{**old, **patch}</code> — Topic 4 dict unpacking.</p>
-          <div class="code-label mt8">curl — change price only</div>
-          <pre class="code-snip">curl -X PATCH \
-  http://127.0.0.1:8004/items/a1b2c3d4 \
-  -H "Content-Type: application/json" \
-  -d '{"price": 19.99}'</pre>
-          <div class="code-label mt8">main.py</div>
-          <pre class="code-snip">patch = {k: v for k, v in
-  item.model_dump().items()
-  if v is not None}
-<span class="highlight-line">store[item_id] = {**existing, **patch}</span></pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">📡</div><div><div class="world-title">5G Core Network</div><div class="world-sub">JSON Patch on SMF context</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">5G uses JSON Patch (RFC 6902) — PATCH with an explicit list of field operations. Same verb, structured diff format.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X PATCH \
-  http://smf/nsmf-pdusession/v1/sm-contexts/1 \
-  -H "Content-Type: application/json-patch+json" \
-  -d '[
-    {"op":"replace",
-     "path":"/qosFlows/0/qfi",
-     "value": 5}
-  ]'</pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🤖</div><div><div class="world-title">Claude AI API</div><div class="world-sub">system prompt as patch</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">When you add a system prompt, you're patching the model's behaviour without changing the base model — partial update, same pattern.</p>
-          <pre class="code-snip">{
-  "model": "claude-sonnet-4-6",
-  <span class="highlight-line">"system": "Reply only in bullet points.",</span>
-  "messages": [
-    {"role": "user",
-     "content": "What is REST?"}
-  ]
-}
-<span class="comment-line"># system field = the patch
-# base model unchanged</span></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DELETE panel -->
-  <div class="worlds-panel" id="wp-delete">
-    <div class="worlds-grid">
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🐍</div><div><div class="world-title">Your Python server</div><div class="world-sub">FastAPI · del from dict</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Remove the item from the store. Returns 204 — no body. The client knows it worked because there was no error.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X DELETE \
-  http://127.0.0.1:8004/items/a1b2c3d4</pre>
-          <div class="code-label mt8">main.py</div>
-          <pre class="code-snip"><span class="highlight-line">del store[item_id]</span>
-<span class="comment-line"># returns HTTP 204 — no body</span></pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">📡</div><div><div class="world-title">5G Core Network</div><div class="world-sub">AMF releases PDU session</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">When your phone disconnects, AMF sends DELETE to SMF to tear down the PDU session and release network resources.</p>
-          <div class="code-label mt8">curl</div>
-          <pre class="code-snip">curl -X DELETE \
-  http://smf/nsmf-pdusession/v1/sm-contexts/1</pre>
-          <div class="code-label mt8">response</div>
-          <pre class="code-snip">HTTP/1.1 204 No Content
-<span class="comment-line"># session released, bearer torn down
-# your phone lost data connectivity</span></pre>
-        </div>
-      </div>
-      <div class="world-card">
-        <div class="world-head"><div class="world-icon">🤖</div><div><div class="world-title">Claude AI API</div><div class="world-sub">stateless = implicit DELETE</div></div></div>
-        <div class="world-body">
-          <p style="font-size:.78rem;color:var(--muted)">Claude's API stores no state between calls — every conversation ends implicitly after the response. The "delete" is automatic: nothing to clean up.</p>
-          <pre class="code-snip"><span class="comment-line"># No explicit DELETE needed.
-# Each POST /messages is self-contained.
-# Want to "forget"? Just don't include
-# prior messages in the next call.</span>
-
-<span class="highlight-line"># This IS the REST way:
-# stateless by design.</span></pre>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- BUILD IT -->
-<section id="build">
-  <div class="section-label">Step 4 — Build it yourself</div>
-  <div class="section-title">Run the real FastAPI server</div>
-  <div class="section-sub">The sandbox above simulates the server in JS. Here's how to run the actual Python version locally — then swap <code style="color:var(--blue)">client.html</code> from mock mode to live mode.</div>
-
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <h3>Clone the repo</h3>
-        <pre class="cmd">git clone https://github.com/sagarmapv/use-python-build-rest.git
-cd use-python-build-rest</pre>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <h3>Install dependencies</h3>
-        <p>Needs Python 3.10+. FastAPI and uvicorn are the only deps.</p>
-        <pre class="cmd">pip install -r requirements.txt</pre>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <h3>Start the server</h3>
-        <pre class="cmd">python main.py
-# → Uvicorn running on http://127.0.0.1:8004</pre>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <h3>Open the local client</h3>
-        <p>Open <code style="color:var(--blue)">client.html</code> in your browser. It connects to your live server — same 5 verbs, real Python dict on the backend.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">5</div>
-      <div class="step-body">
-        <h3>Explore the interactive docs</h3>
-        <p>FastAPI ships a free Swagger UI. Open it while the server is running:</p>
-        <pre class="cmd">http://127.0.0.1:8004/docs</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider">
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Ready to negotiate?</h2>
+  <p>Fire each verb yourself. Watch the offer letter change in real time.</p>
+  <a class="cta-btn" href="journey.html">Open the offer letter →</a>
+  <a class="cta-docs" href="docs.html">Skip to technical docs →</a>
+</div>
 
 <footer>
-  <p>Part of the <strong>AI-For-All</strong> education wing ·
-     <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub →</a>
-  </p>
-  <p style="margin-top:8px">Connects to <a href="https://github.com/sagarmapv/Practice-Python-Project" target="_blank">python-quiz-app</a> · Topics 3, 4, 6, 7</p>
+  Part of the <strong>AI-For-All</strong> education wing ·
+  <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub</a> ·
+  <a href="docs.html">Docs</a>
 </footer>
 
-<script>
-// ── In-browser mock server (mirrors main.py logic exactly) ──────────────────
-const store = {};
-
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
-
-function mockPost(body) {
-  if (!body.name || body.price == null) return { status: 422, data: { detail: "name and price required" } };
-  const id = uid();
-  store[id] = { id, ...body };
-  return { status: 201, data: store[id] };
-}
-function mockGetAll() {
-  return { status: 200, data: Object.values(store) };
-}
-function mockGet(id) {
-  if (!store[id]) return { status: 404, data: { detail: "Item not found" } };
-  return { status: 200, data: store[id] };
-}
-function mockPut(id, body) {
-  if (!store[id]) return { status: 404, data: { detail: "Item not found" } };
-  if (!body.name || body.price == null) return { status: 422, data: { detail: "name and price required" } };
-  store[id] = { id, ...body };
-  return { status: 200, data: store[id] };
-}
-function mockPatch(id, body) {
-  if (!store[id]) return { status: 404, data: { detail: "Item not found" } };
-  const patch = {};
-  if (body.name)  patch.name = body.name;
-  if (body.description) patch.description = body.description;
-  if (body.price != null) patch.price = body.price;
-  store[id] = { ...store[id], ...patch };
-  return { status: 200, data: store[id] };
-}
-function mockDelete(id) {
-  if (!store[id]) return { status: 404, data: { detail: "Item not found" } };
-  delete store[id];
-  return { status: 204, data: null };
-}
-
-// ── UI helpers ──────────────────────────────────────────────────────────────
-function toggle(id) {
-  document.getElementById(id).classList.toggle('open');
-}
-
-const EXPLAIN = {
-  POST:   (r) => r.status === 201
-    ? `Server received your POST body, validated the fields (Pydantic → Topic 4), assigned a random ID using <code>uuid</code>, stored it in the dict: <code>store["${r.data.id}"] = {...}</code>, and returned <strong>201 Created</strong> with the new item.`
-    : `Validation failed — FastAPI rejected the body before it even touched the dict.`,
-  GETALL: (r) => `Server called <code>list(store.values())</code> — a Topic 4 dict operation. No state changed. Returns <strong>200 OK</strong> with ${r.data.length} item(s).`,
-  GET:    (r) => r.status === 200
-    ? `Server looked up <code>store["${r.data.id}"]</code> — O(1) dict access. Returned the item as JSON. <strong>200 OK</strong>.`
-    : `<code>item_id not in store</code> → <code>raise HTTPException(404)</code>. The dict had no entry for that ID.`,
-  PUT:    (r) => r.status === 200
-    ? `Full replace: <code>store[id] = {"id": id, ...new_body}</code>. Old entry gone. <strong>200 OK</strong>.`
-    : `Item not found — can't replace what doesn't exist.`,
-  PATCH:  (r) => r.status === 200
-    ? `Partial update: <code>{**existing, **patch}</code> — dict unpacking from Topic 4. Only the fields you sent were overwritten. <strong>200 OK</strong>.`
-    : `Item not found.`,
-  DELETE: (r) => r.status === 204
-    ? `<code>del store[id]</code> — one dict operation. Server returns <strong>204 No Content</strong>: success, but nothing to say.`
-    : `Item not found — nothing to delete.`,
-};
-
-function showResult(result, verb) {
-  const box = document.getElementById('resp-box');
-  const tag = document.getElementById('s-tag');
-  const action = document.getElementById('last-action');
-  const explain = document.getElementById('explain-panel');
-  const ebody  = document.getElementById('explain-body');
-
-  const { status, data } = result;
-  box.textContent = data === null ? '(204 No Content — success, no body)' : JSON.stringify(data, null, 2);
-
-  if (status >= 200 && status < 300) {
-    tag.className = 'status-tag s2'; tag.textContent = status;
-  } else {
-    tag.className = 'status-tag s4'; tag.textContent = status;
-  }
-  action.textContent = verb + ' · just now';
-
-  if (EXPLAIN[verb]) {
-    explain.style.display = 'block';
-    ebody.innerHTML = EXPLAIN[verb](result);
-  }
-
-  renderStore();
-}
-
-function renderStore() {
-  const ul = document.getElementById('store-list');
-  const items = Object.values(store);
-  if (!items.length) {
-    ul.innerHTML = '<li class="empty-msg">empty — create an item first</li>';
-    return;
-  }
-  ul.innerHTML = items.map(item => `
-    <li>
-      <span class="iid">id: ${item.id}</span>
-      <span class="iname">${item.name}</span>
-      ${item.description ? `<span class="idesc"> — ${item.description}</span>` : ''}
-      <span class="iprice">$${Number(item.price).toFixed(2)}</span>
-    </li>
-  `).join('');
-}
-
-// ── Verb handlers ────────────────────────────────────────────────────────────
-function sbPost() {
-  const name  = document.getElementById('p-name').value.trim();
-  const desc  = document.getElementById('p-desc').value.trim();
-  const price = parseFloat(document.getElementById('p-price').value);
-  const body  = { name, price };
-  if (desc) body.description = desc;
-  showResult(mockPost(body), 'POST');
-}
-function sbGetAll() { showResult(mockGetAll(), 'GETALL'); }
-function sbGet() {
-  showResult(mockGet(document.getElementById('g-id').value.trim()), 'GET');
-}
-function sbPut() {
-  const id    = document.getElementById('put-id').value.trim();
-  const name  = document.getElementById('put-name').value.trim();
-  const desc  = document.getElementById('put-desc').value.trim();
-  const price = parseFloat(document.getElementById('put-price').value);
-  const body  = { name, price };
-  if (desc) body.description = desc;
-  showResult(mockPut(id, body), 'PUT');
-}
-function sbPatch() {
-  const id    = document.getElementById('pa-id').value.trim();
-  const name  = document.getElementById('pa-name').value.trim();
-  const desc  = document.getElementById('pa-desc').value.trim();
-  const price = document.getElementById('pa-price').value;
-  const body  = {};
-  if (name)  body.name = name;
-  if (desc)  body.description = desc;
-  if (price !== '') body.price = parseFloat(price);
-  showResult(mockPatch(id, body), 'PATCH');
-}
-function sbDelete() {
-  showResult(mockDelete(document.getElementById('d-id').value.trim()), 'DELETE');
-}
-
-// ── Worlds tabs ──────────────────────────────────────────────────────────────
-function showWorld(verb) {
-  document.querySelectorAll('.worlds-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.wtab').forEach(t => t.classList.remove('active'));
-  document.getElementById('wp-' + verb).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-</script>
 </body>
 </html>

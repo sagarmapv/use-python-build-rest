@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Negotiate Your Offer — REST Journey</title>
+<style>
+:root {
+  --bg: #0a0f1e;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --border: #1f2d45;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --blue: #38bdf8;
+  --green: #34d399;
+  --orange: #fb923c;
+  --purple: #c084fc;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --lime: #4ade80;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+/* NAV */
+nav {
+  display: flex; align-items: center; gap: 24px; padding: 0 32px; height: 52px;
+  background: rgba(10,15,30,.97); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-brand { font-weight: 800; font-size: .9rem; color: var(--blue); }
+nav a { font-size: .8rem; color: var(--muted); text-decoration: none; }
+nav a:hover { color: var(--text); }
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 3px; background: var(--border);
+  position: sticky; top: 52px; z-index: 99;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple), var(--lime));
+  transition: width .5s ease; width: 0%;
+}
+
+/* STEPS NAV */
+.steps-nav {
+  display: flex; gap: 0; padding: 0 32px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  overflow-x: auto; position: sticky; top: 55px; z-index: 98;
+}
+.step-tab {
+  display: flex; align-items: center; gap: 8px; padding: 12px 20px;
+  border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: all .15s; opacity: .4; pointer-events: none;
+}
+.step-tab.unlocked { opacity: .7; pointer-events: auto; cursor: pointer; }
+.step-tab.active { opacity: 1; border-bottom-color: var(--blue); }
+.step-tab.done { opacity: .6; }
+.step-tab .tab-verb {
+  font-size: .62rem; font-weight: 800; padding: 2px 7px; border-radius: 3px;
+}
+.tv-post   { background: #064e3b44; color: var(--green);  border: 1px solid #34d39944; }
+.tv-get    { background: #1e3a5f44; color: var(--blue);   border: 1px solid #38bdf844; }
+.tv-put    { background: #451a0344; color: var(--orange); border: 1px solid #fb923c44; }
+.tv-patch  { background: #2e106544; color: var(--purple); border: 1px solid #c084fc44; }
+.tv-delete { background: #450a0a44; color: var(--red);    border: 1px solid #f8717144; }
+.tv-hire   { background: #14532d44; color: var(--lime);   border: 1px solid #4ade8044; }
+.step-tab .tab-label { font-size: .78rem; color: var(--text); }
+.step-tab .tab-check { color: var(--green); font-size: .8rem; margin-left: 4px; }
+
+/* LAYOUT */
+.layout {
+  display: grid; grid-template-columns: 1fr 380px;
+  gap: 0; min-height: calc(100vh - 108px);
+}
+@media(max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+/* LEFT — STEPS */
+.steps-area { padding: 32px; border-right: 1px solid var(--border); }
+
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+
+.step-header { margin-bottom: 28px; }
+.step-number {
+  font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.step-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
+.step-story { color: var(--muted); font-size: .9rem; line-height: 1.8; margin-bottom: 24px; }
+.step-story strong { color: var(--text); }
+
+/* HTTP ANATOMY */
+.anatomy {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 16px; margin-bottom: 24px; font-size: .78rem; font-family: monospace; line-height: 2;
+}
+.anatomy .verb-line { color: var(--blue); font-weight: 700; }
+.anatomy .header-line { color: var(--muted); }
+.anatomy .body-line { color: var(--yellow); }
+.anatomy .comment { color: #334155; }
+
+/* FORM */
+.action-form { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+.form-title {
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-full { grid-column: 1 / -1; }
+label { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 5px; }
+input, select {
+  width: 100%; padding: 9px 12px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text); font-size: .85rem;
+}
+input:focus, select:focus { outline: none; border-color: var(--blue); }
+input[readonly] { color: var(--muted); cursor: not-allowed; }
+
+.hint-text { font-size: .72rem; color: var(--muted); margin-top: 6px; font-style: italic; }
+.optional { color: var(--muted); font-size: .65rem; }
+
+.btn-fire {
+  margin-top: 18px; width: 100%; padding: 12px; border: none; border-radius: 8px;
+  font-size: .9rem; font-weight: 700; cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-post   { background: #064e3b; color: var(--green);  border: 1px solid var(--green); }
+.btn-get    { background: #1e3a5f; color: var(--blue);   border: 1px solid var(--blue); }
+.btn-put    { background: #451a03; color: var(--orange); border: 1px solid var(--orange); }
+.btn-patch  { background: #2e1065; color: var(--purple); border: 1px solid var(--purple); }
+.btn-delete { background: #450a0a; color: var(--red);    border: 1px solid var(--red); }
+.btn-hire   { background: #14532d; color: var(--lime);   border: 1px solid var(--lime); }
+.btn-fire:hover { filter: brightness(1.2); transform: translateY(-1px); }
+
+/* RESPONSE */
+.response-area { margin-top: 22px; }
+.resp-label {
+  font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+}
+.status-pill {
+  font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+}
+.s201, .s200 { background: #064e3b; color: var(--green); }
+.s204        { background: #1e3a5f; color: var(--blue); }
+.s404, .s422 { background: #450a0a; color: var(--red); }
+
+pre.resp-box {
+  background: #050a14; border: 1px solid #1e3a5f; border-radius: 8px;
+  padding: 14px; font-size: .78rem; color: #7dd3fc; white-space: pre-wrap;
+  font-family: 'Cascadia Code','Fira Code',monospace; min-height: 60px;
+  max-height: 240px; overflow-y: auto; line-height: 1.7;
+}
+
+/* EXPLAIN BOX */
+.explain-box {
+  margin-top: 14px; padding: 14px 16px; background: var(--surface2);
+  border: 1px solid var(--border); border-left: 3px solid var(--blue);
+  border-radius: 0 8px 8px 0; font-size: .82rem; color: var(--muted); line-height: 1.7;
+  display: none;
+}
+.explain-box.show { display: block; }
+.explain-box strong { color: var(--text); }
+.explain-box code { color: var(--blue); font-family: monospace; font-size: .8rem; }
+
+/* NEXT BTN */
+.next-btn {
+  margin-top: 20px; width: 100%; padding: 13px; background: var(--blue); color: #0a0f1e;
+  border: none; border-radius: 8px; font-size: .9rem; font-weight: 800;
+  cursor: pointer; display: none; transition: transform .15s;
+}
+.next-btn:hover { transform: translateY(-1px); }
+.next-btn.show { display: block; }
+
+/* RIGHT SIDEBAR */
+.sidebar {
+  padding: 24px; background: var(--surface); position: sticky;
+  top: 108px; height: calc(100vh - 108px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+.sidebar-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.sidebar-head {
+  padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border);
+  font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); display: flex; justify-content: space-between; align-items: center;
+}
+.sidebar-body { padding: 14px; }
+
+/* OFFER LETTER LIVE */
+.offer-field { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.offer-field:last-child { border: none; }
+.of-key { font-size: .76rem; color: var(--muted); }
+.of-val { font-size: .76rem; font-weight: 600; font-family: monospace; transition: color .3s; }
+.of-val.changed { color: var(--yellow) !important; }
+.empty-store { font-size: .78rem; color: var(--muted); font-style: italic; text-align: center; padding: 16px 0; }
+
+/* EMPLOYEES TABLE */
+.employee-row {
+  padding: 10px 12px; background: #050a14; border: 1px solid #14532d44;
+  border-radius: 6px; margin-bottom: 8px; font-size: .76rem;
+}
+.emp-name { color: var(--lime); font-weight: 700; }
+.emp-id   { color: var(--muted); font-size: .68rem; }
+
+/* JOURNEY COMPLETE */
+.journey-complete {
+  display: none; text-align: center; padding: 48px 32px;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, #0a2a18, var(--bg));
+  border-top: 1px solid var(--border);
+}
+.journey-complete.show { display: block; }
+.journey-complete h2 { font-size: 1.8rem; font-weight: 900; color: var(--lime); margin-bottom: 12px; }
+.journey-complete p { color: var(--muted); margin-bottom: 28px; font-size: .92rem; }
+.complete-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.complete-links a {
+  padding: 11px 24px; border-radius: 99px; font-size: .85rem; font-weight: 700;
+  text-decoration: none; transition: transform .15s;
+}
+.complete-links a:hover { transform: translateY(-2px); }
+.link-docs { background: var(--surface2); color: var(--blue); border: 1px solid var(--blue); }
+.link-home { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.link-gh   { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">← REST APIs</a>
+  <a href="docs.html">Technical Docs</a>
+  <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub</a>
+</nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- STEPS TABS -->
+<div class="steps-nav">
+  <div class="step-tab unlocked active" id="tab-0" onclick="goStep(0)">
+    <span class="tab-verb tv-post">POST</span>
+    <span class="tab-label">Counter-offer</span>
+  </div>
+  <div class="step-tab" id="tab-1" onclick="goStep(1)">
+    <span class="tab-verb tv-get">GET</span>
+    <span class="tab-label">Check terms</span>
+  </div>
+  <div class="step-tab" id="tab-2" onclick="goStep(2)">
+    <span class="tab-verb tv-put">PUT</span>
+    <span class="tab-label">Full renegotiation</span>
+  </div>
+  <div class="step-tab" id="tab-3" onclick="goStep(3)">
+    <span class="tab-verb tv-patch">PATCH</span>
+    <span class="tab-label">Bump salary</span>
+  </div>
+  <div class="step-tab" id="tab-4" onclick="goStep(4)">
+    <span class="tab-verb tv-delete">DELETE</span>
+    <span class="tab-label">Accept offer</span>
+  </div>
+  <div class="step-tab" id="tab-5" onclick="goStep(5)">
+    <span class="tab-verb tv-hire">POST</span>
+    <span class="tab-label">Welcome aboard</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- LEFT -->
+  <div class="steps-area">
+
+    <!-- STEP 0 — POST -->
+    <div class="step-panel active" id="step-0">
+      <div class="step-header">
+        <div class="step-number">Step 1 of 6 · POST</div>
+        <div class="step-title">Submit your counter-offer</div>
+        <div class="step-story">
+          HR's initial offer is sitting in your inbox. <strong>₹14L. 2 days WFH. No joining bonus.</strong>
+          You're worth more than that.<br><br>
+          You type your counter-offer and hit send. That's a <strong>POST request</strong> —
+          you're asking the server (HR Portal) to <em>create</em> a new negotiation record in the store (their system).
+          If successful, you'll get back a <strong>201 Created</strong> with your new negotiation ID.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># What you're sending under the hood:</div>
+        <div class="verb-line">POST /negotiations HTTP/1.1</div>
+        <div class="header-line">Host: hr-portal.company.com</div>
+        <div class="header-line">Content-Type: application/json</div>
+        <div class="body-line">{</div>
+        <div class="body-line">&nbsp;&nbsp;"candidate_name": "...",</div>
+        <div class="body-line">&nbsp;&nbsp;"salary": 1800000,</div>
+        <div class="body-line">&nbsp;&nbsp;"wfh_days": 4,</div>
+        <div class="body-line">&nbsp;&nbsp;"joining_bonus": 100000</div>
+        <div class="body-line">}</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-post">POST</span> /negotiations — your counter-offer</div>
+        <div class="form-grid">
+          <div class="form-full">
+            <label>Your name</label>
+            <input id="p-name" type="text" placeholder="e.g. Aditya Sharma">
+          </div>
+          <div>
+            <label>Salary ask (₹ / year)</label>
+            <input id="p-salary" type="number" placeholder="1800000" value="1800000">
+          </div>
+          <div>
+            <label>WFH days / week</label>
+            <input id="p-wfh" type="number" placeholder="4" value="4" min="0" max="5">
+          </div>
+          <div>
+            <label>Joining bonus (₹) <span class="optional">optional</span></label>
+            <input id="p-bonus" type="number" placeholder="100000">
+          </div>
+          <div>
+            <label>Role</label>
+            <input id="p-role" type="text" placeholder="Senior Engineer" value="Senior Engineer">
+          </div>
+        </div>
+        <button class="btn-fire btn-post" onclick="doPost()">
+          📤 Send POST request
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s0-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s0-resp">Waiting for your request...</pre>
+        </div>
+        <div class="explain-box" id="s0-explain"></div>
+        <button class="next-btn" id="s0-next" onclick="unlock(1)">Next: Check what HR recorded → GET</button>
+      </div>
+    </div>
+
+    <!-- STEP 1 — GET -->
+    <div class="step-panel" id="step-1">
+      <div class="step-header">
+        <div class="step-number">Step 2 of 6 · GET</div>
+        <div class="step-title">Check what HR has on file</div>
+        <div class="step-story">
+          You sent your counter-offer. But did they record it correctly?
+          You ask: <strong>"What exactly does your system show for my negotiation?"</strong><br><br>
+          That's a <strong>GET request</strong> — read-only, no changes, just fetch.
+          The server looks up your negotiation ID in the store and returns whatever it finds.
+          This is the most common REST call in any system.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># Read-only — no body needed</div>
+        <div class="verb-line">GET /negotiations/<span id="get-id-display" style="color:var(--yellow)">your-id</span> HTTP/1.1</div>
+        <div class="header-line">Host: hr-portal.company.com</div>
+        <div class="comment"># No Content-Type, no body — GET never has a body</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-get">GET</span> /negotiations/{id} — read current terms</div>
+        <div>
+          <label>Negotiation ID (auto-filled from your POST)</label>
+          <input id="g-id" type="text" readonly>
+          <div class="hint-text">This ID was returned by the server when you submitted your counter-offer.</div>
+        </div>
+        <button class="btn-fire btn-get" onclick="doGet()">
+          🔍 Send GET request
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s1-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s1-resp">Waiting...</pre>
+        </div>
+        <div class="explain-box" id="s1-explain"></div>
+        <button class="next-btn" id="s1-next" onclick="unlock(2)">Next: Renegotiate everything → PUT</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 — PUT -->
+    <div class="step-panel" id="step-2">
+      <div class="step-header">
+        <div class="step-number">Step 3 of 6 · PUT</div>
+        <div class="step-title">Full renegotiation</div>
+        <div class="step-story">
+          HR came back with a counter-counter. You've reconsidered your entire position.
+          You want to send a <strong>completely new set of terms</strong> — not a tweak, a full replacement.<br><br>
+          That's a <strong>PUT request</strong>. You send every field. The server replaces the entire record.
+          If you leave a field out, it disappears. PUT is <em>destructive</em> by design — it's a full overwrite.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># Must send ALL fields — old record fully replaced</div>
+        <div class="verb-line">PUT /negotiations/<span style="color:var(--yellow)">your-id</span> HTTP/1.1</div>
+        <div class="header-line">Content-Type: application/json</div>
+        <div class="body-line">{  <span style="color:#334155">/* complete new record */</span></div>
+        <div class="body-line">&nbsp;&nbsp;"salary": 1700000,</div>
+        <div class="body-line">&nbsp;&nbsp;"wfh_days": 3,</div>
+        <div class="body-line">&nbsp;&nbsp;"joining_bonus": 75000,</div>
+        <div class="body-line">&nbsp;&nbsp;"role": "Senior Engineer"</div>
+        <div class="body-line">}</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-put">PUT</span> /negotiations/{id} — replace all terms</div>
+        <div class="form-grid">
+          <div>
+            <label>New salary (₹)</label>
+            <input id="put-salary" type="number" value="1700000">
+          </div>
+          <div>
+            <label>WFH days / week</label>
+            <input id="put-wfh" type="number" value="3" min="0" max="5">
+          </div>
+          <div>
+            <label>Joining bonus (₹)</label>
+            <input id="put-bonus" type="number" value="75000">
+          </div>
+          <div>
+            <label>Role</label>
+            <input id="put-role" type="text" value="Senior Engineer">
+          </div>
+        </div>
+        <div class="hint-text">All 4 fields required. This replaces the entire record — not a merge.</div>
+        <button class="btn-fire btn-put" onclick="doPut()">
+          🔄 Send PUT request
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s2-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s2-resp">Waiting...</pre>
+        </div>
+        <div class="explain-box" id="s2-explain"></div>
+        <button class="next-btn" id="s2-next" onclick="unlock(3)">Next: Just the salary → PATCH</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — PATCH -->
+    <div class="step-panel" id="step-3">
+      <div class="step-header">
+        <div class="step-number">Step 4 of 6 · PATCH</div>
+        <div class="step-title">Just bump the salary</div>
+        <div class="step-story">
+          HR agreed on 3 days WFH and the joining bonus. One thing left: <strong>you want ₹17.5L, not ₹17L</strong>.
+          Everything else is settled — you don't want to resend the whole offer and risk them reopening other terms.<br><br>
+          That's a <strong>PATCH request</strong> — send <em>only</em> what changed.
+          The server merges your patch into the existing record: <code style="color:var(--purple)">{**existing, **patch}</code>.
+          One field updated. Everything else untouched.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># Only send what changed — server merges the rest</div>
+        <div class="verb-line">PATCH /negotiations/<span style="color:var(--yellow)">your-id</span> HTTP/1.1</div>
+        <div class="header-line">Content-Type: application/json</div>
+        <div class="body-line">{"salary": 1750000}</div>
+        <div class="comment"># wfh_days, joining_bonus, role — untouched</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-patch">PATCH</span> /negotiations/{id} — update one field</div>
+        <div>
+          <label>Updated salary (₹)</label>
+          <input id="pa-salary" type="number" value="1750000">
+          <div class="hint-text">Leave other fields blank — only salary will change.</div>
+        </div>
+        <button class="btn-fire btn-patch" onclick="doPatch()">
+          ✏️ Send PATCH request
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s3-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s3-resp">Waiting...</pre>
+        </div>
+        <div class="explain-box" id="s3-explain"></div>
+        <button class="next-btn" id="s3-next" onclick="unlock(4)">Next: Accept the offer → DELETE</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 — DELETE -->
+    <div class="step-panel" id="step-4">
+      <div class="step-header">
+        <div class="step-number">Step 5 of 6 · DELETE</div>
+        <div class="step-title">You accepted — close the negotiation</div>
+        <div class="step-story">
+          You've got what you wanted. ₹17.5L. 3 days WFH. ₹75K joining bonus. You accept.<br><br>
+          The HR system no longer needs your <em>negotiation</em> record —
+          you're no longer a candidate in negotiation. So it gets <strong>deleted</strong>.<br><br>
+          DELETE isn't always a bad thing. Here it's graduation.
+          The server returns <strong>204 No Content</strong> — success, nothing left to say.
+          Then watch what happens next.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># No body needed — just the ID in the URL</div>
+        <div class="verb-line">DELETE /negotiations/<span style="color:var(--yellow)">your-id</span> HTTP/1.1</div>
+        <div class="header-line">Host: hr-portal.company.com</div>
+        <div class="comment"># Response: 204 No Content</div>
+        <div class="comment"># The record is gone. The negotiation is over.</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-delete">DELETE</span> /negotiations/{id} — accept &amp; close</div>
+        <div style="padding:14px;background:var(--surface2);border-radius:8px;border:1px solid #450a0a44;margin-bottom:16px;">
+          <div style="font-size:.78rem;color:var(--red);font-weight:600;margin-bottom:4px;">⚠ This will remove your negotiation record</div>
+          <div style="font-size:.76rem;color:var(--muted)">Negotiation ID: <code id="del-id-display" style="color:var(--yellow)"></code></div>
+        </div>
+        <button class="btn-fire btn-delete" onclick="doDelete()">
+          ✅ Accept offer &amp; send DELETE
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s4-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s4-resp">Waiting...</pre>
+        </div>
+        <div class="explain-box" id="s4-explain"></div>
+        <button class="next-btn" id="s4-next" onclick="unlock(5)">Next: Welcome to the team → POST /employees</button>
+      </div>
+    </div>
+
+    <!-- STEP 5 — POST employee -->
+    <div class="step-panel" id="step-5">
+      <div class="step-header">
+        <div class="step-number">Step 6 of 6 · POST</div>
+        <div class="step-title" style="color:var(--lime)">Welcome aboard</div>
+        <div class="step-story">
+          The candidate row is gone. The negotiation is over. But now HR needs to
+          <strong>create a brand new resource</strong> — an employee record.<br><br>
+          Same verb. <strong>POST</strong>. Different endpoint. Different store.
+          This is the insight: REST verbs are actions, not things.
+          POST always means "create something new" — whether it's a negotiation, an employee, a 5G session, or an AI message.
+        </div>
+      </div>
+
+      <div class="anatomy">
+        <div class="comment"># New resource, new endpoint, same verb</div>
+        <div class="verb-line">POST /employees HTTP/1.1</div>
+        <div class="header-line">Content-Type: application/json</div>
+        <div class="body-line">{</div>
+        <div class="body-line">&nbsp;&nbsp;"name": "...",</div>
+        <div class="body-line">&nbsp;&nbsp;"role": "Senior Engineer",</div>
+        <div class="body-line">&nbsp;&nbsp;"salary": 1750000,</div>
+        <div class="body-line">&nbsp;&nbsp;"start_date": "2026-07-01"</div>
+        <div class="body-line">}</div>
+        <div class="comment"># → 201 Created — employee #XXXX</div>
+      </div>
+
+      <div class="action-form">
+        <div class="form-title"><span class="tab-verb tv-hire">POST</span> /employees — onboard yourself</div>
+        <div class="form-grid">
+          <div class="form-full">
+            <label>Employee name</label>
+            <input id="e-name" type="text" placeholder="auto-filled from your offer">
+          </div>
+          <div>
+            <label>Role</label>
+            <input id="e-role" type="text" value="Senior Engineer">
+          </div>
+          <div>
+            <label>Final salary (₹)</label>
+            <input id="e-salary" type="number" value="1750000">
+          </div>
+          <div class="form-full">
+            <label>Start date</label>
+            <input id="e-start" type="text" value="2026-07-01">
+          </div>
+        </div>
+        <button class="btn-fire btn-hire" onclick="doHire()">
+          🎉 Send POST /employees
+        </button>
+        <div class="response-area">
+          <div class="resp-label">Response <span id="s5-pill" class="status-pill"></span></div>
+          <pre class="resp-box" id="s5-resp">Waiting...</pre>
+        </div>
+        <div class="explain-box" id="s5-explain"></div>
+        <button class="next-btn" id="s5-next" onclick="showComplete()" style="background:var(--lime);color:#0a1e0f;">
+          🏁 Complete the journey
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end steps-area -->
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Offer Letter -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">
+        <span>📄 Offer Letter — Live State</span>
+        <span id="neg-id-badge" style="font-size:.65rem;color:var(--muted)"></span>
+      </div>
+      <div class="sidebar-body" id="offer-display">
+        <div class="empty-store">Submit your counter-offer to create the negotiation record</div>
+      </div>
+    </div>
+
+    <!-- Negotiations store -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">
+        <span>🗄 Store: /negotiations</span>
+        <span id="neg-count" style="font-size:.65rem;color:var(--muted)">0 records</span>
+      </div>
+      <div class="sidebar-body" id="neg-store">
+        <div class="empty-store">empty</div>
+      </div>
+    </div>
+
+    <!-- Employees store -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">
+        <span>👥 Store: /employees</span>
+        <span id="emp-count" style="font-size:.65rem;color:var(--muted)">0 employees</span>
+      </div>
+      <div class="sidebar-body" id="emp-store">
+        <div class="empty-store">no employees yet</div>
+      </div>
+    </div>
+
+    <!-- Python connection -->
+    <div class="sidebar-card">
+      <div class="sidebar-head">Python connection</div>
+      <div class="sidebar-body" style="font-size:.72rem;color:var(--muted);line-height:1.8">
+        <div style="margin-bottom:6px">Each verb you fire maps to <strong style="color:var(--text)">one function</strong> in <code style="color:var(--blue)">main.py</code>:</div>
+        <div>POST → <code style="color:var(--green)">create_item()</code></div>
+        <div>GET &nbsp;→ <code style="color:var(--blue)">get_item()</code></div>
+        <div>PUT &nbsp;→ <code style="color:var(--orange)">replace_item()</code></div>
+        <div>PATCH→ <code style="color:var(--purple)">update_item()</code></div>
+        <div>DEL &nbsp;→ <code style="color:var(--red)">delete_item()</code></div>
+        <div style="margin-top:10px">The store is <code style="color:var(--yellow)">store: dict = {}</code> — Topic 4.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- JOURNEY COMPLETE -->
+<div class="journey-complete" id="journey-complete">
+  <div style="font-size:3rem;margin-bottom:16px">🎉</div>
+  <h2>Journey complete. You're hired.</h2>
+  <p>
+    You used all 5 REST verbs. A negotiation was created, read, fully replaced,<br>
+    partially updated, then deleted when you accepted — and a new employee record was born.<br><br>
+    <strong>Same pattern runs 5G networks, AI APIs, and every web app you've ever used.</strong>
+  </p>
+  <div class="complete-links">
+    <a class="link-docs" href="docs.html">See how this maps to 5G &amp; AI →</a>
+    <a class="link-home" href="index.html">← Back to intro</a>
+    <a class="link-gh" href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">Run it locally</a>
+  </div>
+</div>
+
+<script>
+// ── In-browser mock stores ───────────────────────────────────────────────────
+const negotiations = {};
+const employees    = {};
+let currentNegId   = null;
+let currentStep    = 0;
+const TOTAL_STEPS  = 6;
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+// ── Store render ─────────────────────────────────────────────────────────────
+function fmt(n) { return '₹' + Number(n).toLocaleString('en-IN'); }
+
+function renderOfferLetter(neg) {
+  if (!neg) {
+    document.getElementById('offer-display').innerHTML = '<div class="empty-store">Submit your counter-offer to create the negotiation record</div>';
+    document.getElementById('neg-id-badge').textContent = '';
+    return;
+  }
+  document.getElementById('neg-id-badge').textContent = 'id: ' + neg.id;
+  document.getElementById('offer-display').innerHTML = `
+    <div class="offer-field"><span class="of-key">Candidate</span><span class="of-val" style="color:var(--blue)">${neg.candidate_name}</span></div>
+    <div class="offer-field"><span class="of-key">Role</span><span class="of-val">${neg.role}</span></div>
+    <div class="offer-field"><span class="of-key">Salary</span><span class="of-val" style="color:var(--green)">${fmt(neg.salary)}</span></div>
+    <div class="offer-field"><span class="of-key">WFH days/week</span><span class="of-val">${neg.wfh_days}</span></div>
+    <div class="offer-field"><span class="of-key">Joining bonus</span><span class="of-val">${neg.joining_bonus ? fmt(neg.joining_bonus) : '—'}</span></div>
+    <div class="offer-field"><span class="of-key">Status</span><span class="of-val" style="color:var(--yellow)">⏳ negotiating</span></div>
+  `;
+}
+
+function renderNegStore() {
+  const keys = Object.keys(negotiations);
+  document.getElementById('neg-count').textContent = keys.length + ' record' + (keys.length !== 1 ? 's' : '');
+  if (!keys.length) {
+    document.getElementById('neg-store').innerHTML = '<div class="empty-store">empty</div>';
+    return;
+  }
+  document.getElementById('neg-store').innerHTML = keys.map(id => {
+    const n = negotiations[id];
+    return `<div class="employee-row" style="border-color:var(--blue)44">
+      <div class="emp-id">id: ${id}</div>
+      <div class="emp-name" style="color:var(--blue)">${n.candidate_name} — ${fmt(n.salary)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEmpStore() {
+  const keys = Object.keys(employees);
+  document.getElementById('emp-count').textContent = keys.length + ' employee' + (keys.length !== 1 ? 's' : '');
+  if (!keys.length) {
+    document.getElementById('emp-store').innerHTML = '<div class="empty-store">no employees yet</div>';
+    return;
+  }
+  document.getElementById('emp-store').innerHTML = keys.map(id => {
+    const e = employees[id];
+    return `<div class="employee-row">
+      <div class="emp-id">employee #${id}</div>
+      <div class="emp-name">${e.name}</div>
+      <div style="font-size:.72rem;color:var(--muted)">${e.role} · ${fmt(e.salary)} · from ${e.start_date}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(neg) {
+  renderOfferLetter(neg || (currentNegId ? negotiations[currentNegId] : null));
+  renderNegStore();
+  renderEmpStore();
+}
+
+// ── Response helpers ─────────────────────────────────────────────────────────
+function showResp(stepIdx, status, data, explainHtml) {
+  const pill = document.getElementById('s' + stepIdx + '-pill');
+  const box  = document.getElementById('s' + stepIdx + '-resp');
+  const expl = document.getElementById('s' + stepIdx + '-explain');
+  const next = document.getElementById('s' + stepIdx + '-next');
+
+  box.textContent = data === null ? '(204 No Content — success, nothing to return)' : JSON.stringify(data, null, 2);
+
+  const cls = status === 201 ? 's201' : status === 200 ? 's200' : status === 204 ? 's204' : 's404';
+  pill.className = 'status-pill ' + cls;
+  pill.textContent = status;
+
+  expl.innerHTML = explainHtml;
+  expl.classList.add('show');
+  next.classList.add('show');
+}
+
+// ── Verb handlers ─────────────────────────────────────────────────────────────
+function doPost() {
+  const name   = document.getElementById('p-name').value.trim();
+  const salary = parseInt(document.getElementById('p-salary').value);
+  const wfh    = parseInt(document.getElementById('p-wfh').value);
+  const bonus  = parseInt(document.getElementById('p-bonus').value) || 0;
+  const role   = document.getElementById('p-role').value.trim();
+
+  if (!name) { alert('Enter your name'); return; }
+
+  const id = uid();
+  const neg = { id, candidate_name: name, role, salary, wfh_days: wfh, joining_bonus: bonus };
+  negotiations[id] = neg;
+  currentNegId = id;
+
+  // pre-fill later steps
+  document.getElementById('g-id').value = id;
+  document.getElementById('get-id-display').textContent = id;
+  document.getElementById('del-id-display').textContent = id;
+  document.getElementById('e-name').value = name;
+  document.getElementById('e-salary').value = salary;
+  document.getElementById('e-role').value = role;
+
+  renderAll(neg);
+  showResp(0, 201, neg,
+    `<strong>201 Created.</strong> The server validated your body (Pydantic in real FastAPI), assigned ID <code>${id}</code>, and stored it: <code>negotiations["${id}"] = {...}</code>. This is <strong>Topic 4 dict</strong> assignment from python-quiz-app.`
+  );
+}
+
+function doGet() {
+  const id = document.getElementById('g-id').value.trim();
+  const neg = negotiations[id];
+  if (!neg) {
+    showResp(1, 404, { detail: 'Negotiation not found' },
+      `<strong>404 Not Found.</strong> <code>id not in negotiations</code> → server raised HTTPException. Try going back and submitting your counter-offer first.`
+    );
+    return;
+  }
+  renderAll(neg);
+  showResp(1, 200, neg,
+    `<strong>200 OK.</strong> Server did <code>return negotiations["${id}"]</code> — a simple dict lookup. No state changed. GET is always <em>read-only</em>.`
+  );
+}
+
+function doPut() {
+  const salary = parseInt(document.getElementById('put-salary').value);
+  const wfh    = parseInt(document.getElementById('put-wfh').value);
+  const bonus  = parseInt(document.getElementById('put-bonus').value) || 0;
+  const role   = document.getElementById('put-role').value.trim();
+  const id     = currentNegId;
+
+  if (!id || !negotiations[id]) { alert('No active negotiation — go back to step 1'); return; }
+
+  const updated = { id, candidate_name: negotiations[id].candidate_name, role, salary, wfh_days: wfh, joining_bonus: bonus };
+  negotiations[id] = updated;
+
+  // sync patch step
+  document.getElementById('pa-salary').value = salary;
+  document.getElementById('e-salary').value = salary;
+
+  renderAll(updated);
+  showResp(2, 200, updated,
+    `<strong>200 OK.</strong> Server ran <code>negotiations[id] = {"id": id, ...new_body}</code> — full overwrite. The old record is gone, replaced entirely. That's PUT: you own the whole resource now.`
+  );
+}
+
+function doPatch() {
+  const salary = parseInt(document.getElementById('pa-salary').value);
+  const id     = currentNegId;
+
+  if (!id || !negotiations[id]) { alert('No active negotiation'); return; }
+
+  const existing = negotiations[id];
+  const patched  = { ...existing, salary };
+  negotiations[id] = patched;
+  document.getElementById('e-salary').value = salary;
+
+  renderAll(patched);
+  showResp(3, 200, patched,
+    `<strong>200 OK.</strong> Server did <code>{**existing, **patch}</code> — Python dict merge (Topic 4 unpacking). Only salary changed from <strong>${fmt(existing.salary)}</strong> → <strong>${fmt(salary)}</strong>. Everything else survived untouched.`
+  );
+}
+
+function doDelete() {
+  const id = currentNegId;
+  if (!id || !negotiations[id]) { alert('No active negotiation to delete'); return; }
+
+  delete negotiations[id];
+  renderAll(null);
+  renderOfferLetter(null);
+
+  showResp(4, 204, null,
+    `<strong>204 No Content.</strong> Server ran <code>del negotiations["${id}"]</code> — one line. The record is gone. No body in the response — 204 means "it worked, nothing to say." The <em>negotiation</em> store is now empty. Watch the employee store next.`
+  );
+}
+
+function doHire() {
+  const name  = document.getElementById('e-name').value.trim();
+  const role  = document.getElementById('e-role').value.trim();
+  const salary = parseInt(document.getElementById('e-salary').value);
+  const start = document.getElementById('e-start').value.trim();
+
+  const id  = String(1000 + Object.keys(employees).length + 1);
+  const emp = { id, name, role, salary, start_date: start, status: 'active' };
+  employees[id] = emp;
+
+  renderAll(null);
+  showResp(5, 201, emp,
+    `<strong>201 Created.</strong> A brand new <code>POST /employees</code> — same verb, new resource. Candidate <strong>${name}</strong> no longer exists in /negotiations. Employee #${id} now exists in /employees. <em>Same verb. Different endpoint. Different life chapter.</em>`
+  );
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function goStep(n) {
+  const tab = document.getElementById('tab-' + n);
+  if (!tab.classList.contains('unlocked')) return;
+
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.step-tab').forEach(t => t.classList.remove('active'));
+
+  document.getElementById('step-' + n).classList.add('active');
+  tab.classList.add('active');
+  currentStep = n;
+  updateProgress();
+}
+
+function unlock(n) {
+  const tab = document.getElementById('tab-' + (n - 1));
+  if (tab) { tab.classList.remove('active'); tab.classList.add('done'); tab.innerHTML += '<span class="tab-check">✓</span>'; }
+
+  const next = document.getElementById('tab-' + n);
+  if (next) next.classList.add('unlocked');
+
+  goStep(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  const pct = ((currentStep + 1) / TOTAL_STEPS) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function showComplete() {
+  document.getElementById('journey-complete').classList.add('show');
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('journey-complete').scrollIntoView({ behavior: 'smooth' });
+  // mark last tab done
+  const last = document.getElementById('tab-5');
+  if (last) { last.classList.remove('active'); last.classList.add('done'); }
+}
+
+updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REST API Docs — Python · 5G · AI</title>
+<style>
+:root {
+  --bg: #0a0f1e; --surface: #111827; --surface2: #1a2235; --border: #1f2d45;
+  --text: #e2e8f0; --muted: #64748b; --blue: #38bdf8; --green: #34d399;
+  --orange: #fb923c; --purple: #c084fc; --red: #f87171; --yellow: #fbbf24; --lime: #4ade80;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+nav {
+  display: flex; align-items: center; gap: 24px; padding: 0 40px; height: 52px;
+  background: rgba(10,15,30,.97); border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-brand { font-weight: 800; font-size: .9rem; color: var(--blue); }
+nav a { font-size: .8rem; color: var(--muted); text-decoration: none; }
+nav a:hover { color: var(--text); }
+
+/* LAYOUT */
+.doc-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+@media(max-width:720px) { .doc-layout { grid-template-columns: 1fr; } }
+
+/* SIDEBAR NAV */
+.doc-nav {
+  padding: 24px 16px; border-right: 1px solid var(--border);
+  position: sticky; top: 52px; height: calc(100vh - 52px); overflow-y: auto;
+}
+.doc-nav-section { font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 20px 0 8px; }
+.doc-nav-section:first-child { margin-top: 0; }
+.doc-nav a {
+  display: block; padding: 6px 10px; border-radius: 6px; font-size: .8rem;
+  color: var(--muted); text-decoration: none; transition: all .12s;
+}
+.doc-nav a:hover { background: var(--surface); color: var(--text); }
+.doc-nav a.active { background: #0c2a4a; color: var(--blue); }
+
+/* CONTENT */
+.doc-content { padding: 40px 48px; max-width: 860px; }
+@media(max-width:720px) { .doc-content { padding: 24px 20px; } }
+
+h1.doc-title { font-size: 2rem; font-weight: 900; margin-bottom: 8px; letter-spacing: -.02em; }
+.doc-intro { color: var(--muted); font-size: .95rem; margin-bottom: 48px; max-width: 540px; }
+
+.doc-section { margin-bottom: 60px; scroll-margin-top: 72px; }
+.doc-section h2 {
+  font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+}
+.doc-section p { color: var(--muted); font-size: .88rem; line-height: 1.8; margin-bottom: 14px; }
+.doc-section p strong { color: var(--text); }
+
+/* VERB BADGE */
+.vb { display: inline-block; font-size: .65rem; font-weight: 800; padding: 3px 9px; border-radius: 4px; }
+.vb-post   { background:#064e3b44;color:var(--green); border:1px solid #34d39944; }
+.vb-get    { background:#1e3a5f44;color:var(--blue);  border:1px solid #38bdf844; }
+.vb-put    { background:#451a0344;color:var(--orange);border:1px solid #fb923c44; }
+.vb-patch  { background:#2e106544;color:var(--purple);border:1px solid #c084fc44; }
+.vb-delete { background:#450a0a44;color:var(--red);   border:1px solid #f8717144; }
+
+/* WORLDS TABLE */
+.worlds-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+.worlds-table th {
+  text-align: left; font-size: .72rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--muted); padding: 10px 14px;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+}
+.worlds-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: .82rem; vertical-align: top; }
+.worlds-table tr:last-child td { border: none; }
+.worlds-table tr:hover td { background: var(--surface2); }
+.col-verb { width: 80px; }
+.col-python { color: var(--green); font-size: .78rem; }
+.col-5g     { color: var(--blue);  font-size: .78rem; }
+.col-ai     { color: var(--purple);font-size: .78rem; }
+
+/* CODE BLOCKS */
+pre.code {
+  background: #050a14; border: 1px solid var(--border); border-radius: 8px;
+  padding: 18px; font-size: .78rem; line-height: 1.8; white-space: pre-wrap;
+  word-break: break-all; overflow-x: auto; margin: 12px 0;
+  font-family: 'Cascadia Code','Fira Code',monospace;
+}
+.c-blue   { color: var(--blue); }
+.c-green  { color: var(--green); }
+.c-yellow { color: var(--yellow); }
+.c-purple { color: var(--purple); }
+.c-red    { color: var(--red); }
+.c-muted  { color: #334155; }
+
+/* TABS */
+.tab-bar { display: flex; gap: 6px; margin-bottom: 0; }
+.tab-btn {
+  padding: 7px 16px; background: var(--surface2); border: 1px solid var(--border);
+  border-bottom: none; border-radius: 7px 7px 0 0; font-size: .78rem; cursor: pointer;
+  color: var(--muted); transition: all .12s;
+}
+.tab-btn.active { background: #050a14; color: var(--text); border-color: var(--border); }
+.tab-pane { display: none; border: 1px solid var(--border); border-radius: 0 8px 8px 8px; }
+.tab-pane.active { display: block; }
+.tab-pane pre.code { border: none; border-radius: 0 8px 8px 8px; margin: 0; }
+
+/* CONNECT TABLE */
+.connect-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.connect-table th {
+  text-align: left; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.connect-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: .8rem; vertical-align: top; }
+.connect-table tr:last-child td { border: none; }
+.topic-pill {
+  display: inline-block; font-size: .68rem; font-weight: 600; padding: 2px 8px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--muted);
+}
+
+/* STEPS */
+.setup-step { display: flex; gap: 16px; margin-bottom: 20px; }
+.sn {
+  flex-shrink: 0; width: 30px; height: 30px; background: #0c2a4a; border: 1px solid var(--blue);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; color: var(--blue);
+}
+.setup-step h3 { font-size: .88rem; font-weight: 600; margin-bottom: 4px; }
+.setup-step p  { font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+
+/* STATUS CODES */
+.status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; margin: 16px 0; }
+.status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.status-code { font-size: 1.1rem; font-weight: 800; font-family: monospace; margin-bottom: 4px; }
+.status-name { font-size: .72rem; font-weight: 600; margin-bottom: 4px; }
+.status-desc { font-size: .72rem; color: var(--muted); }
+
+footer { text-align:center; padding:32px 24px; border-top:1px solid var(--border); font-size:.75rem; color:var(--muted); }
+footer a { color:var(--blue); text-decoration:none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">← REST APIs</a>
+  <a href="journey.html">Interactive Journey</a>
+  <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub</a>
+</nav>
+
+<div class="doc-layout">
+
+  <!-- DOC SIDEBAR -->
+  <div class="doc-nav">
+    <div class="doc-nav-section">Reference</div>
+    <a href="#verbs">The 5 Verbs</a>
+    <a href="#three-worlds">3 Worlds</a>
+    <a href="#status-codes">Status Codes</a>
+
+    <div class="doc-nav-section">This Project</div>
+    <a href="#endpoints">Endpoints</a>
+    <a href="#connect">Python Topics</a>
+    <a href="#local-setup">Run Locally</a>
+
+    <div class="doc-nav-section">Real World</div>
+    <a href="#5g-detail">5G REST (SBI)</a>
+    <a href="#ai-detail">AI API Calls</a>
+  </div>
+
+  <!-- DOC CONTENT -->
+  <div class="doc-content">
+    <h1 class="doc-title">Technical Reference</h1>
+    <p class="doc-intro">
+      Everything behind the offer letter journey — verbs, endpoints, status codes,
+      and how the same patterns appear in 5G networks and AI APIs.
+    </p>
+
+    <!-- THE 5 VERBS -->
+    <div class="doc-section" id="verbs">
+      <h2><span class="vb vb-post">POST</span><span class="vb vb-get">GET</span><span class="vb vb-put">PUT</span><span class="vb vb-patch">PATCH</span><span class="vb vb-delete">DELETE</span> &nbsp;The 5 Verbs</h2>
+      <p>REST APIs are constrained to these 5 HTTP methods. The constraint is the point — every API in the world speaks the same language.</p>
+
+      <table class="worlds-table">
+        <thead>
+          <tr>
+            <th class="col-verb">Verb</th>
+            <th>Intent</th>
+            <th>Idempotent?</th>
+            <th>Has body?</th>
+            <th>Safe?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="vb vb-post">POST</span></td>   <td>Create a new resource</td>           <td>No</td>  <td>Yes</td> <td>No</td></tr>
+          <tr><td><span class="vb vb-get">GET</span></td>     <td>Read a resource</td>                 <td>Yes</td> <td>No</td>  <td>Yes</td></tr>
+          <tr><td><span class="vb vb-put">PUT</span></td>     <td>Replace entire resource</td>          <td>Yes</td> <td>Yes</td> <td>No</td></tr>
+          <tr><td><span class="vb vb-patch">PATCH</span></td> <td>Partial update</td>                  <td>Maybe</td><td>Yes</td> <td>No</td></tr>
+          <tr><td><span class="vb vb-delete">DELETE</span></td><td>Remove a resource</td>              <td>Yes</td> <td>No</td>  <td>No</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Idempotent</strong> means calling it twice has the same effect as calling it once. <strong>Safe</strong> means it never changes server state.</p>
+    </div>
+
+    <!-- THREE WORLDS -->
+    <div class="doc-section" id="three-worlds">
+      <h2>🌐 Same Verb, Three Worlds</h2>
+      <p>REST is the universal interface. Here's the same 5 verbs expressed in three completely different domains.</p>
+
+      <table class="worlds-table">
+        <thead>
+          <tr><th>Verb</th><th>🐍 Your Python Server</th><th>📡 5G Core (SBI)</th><th>🤖 Claude AI API</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="vb vb-post">POST</span></td>
+            <td class="col-python">POST /items<br><span style="color:var(--muted)">Create item in dict</span></td>
+            <td class="col-5g">POST /nsmf-pdusession/v1/sm-contexts<br><span style="color:var(--muted)">AMF creates PDU session via SMF</span></td>
+            <td class="col-ai">POST /v1/messages<br><span style="color:var(--muted)">Send conversation, get completion</span></td>
+          </tr>
+          <tr>
+            <td><span class="vb vb-get">GET</span></td>
+            <td class="col-python">GET /items/{id}<br><span style="color:var(--muted)">Read item from dict</span></td>
+            <td class="col-5g">GET /nnrf-disc/v1/nf-instances<br><span style="color:var(--muted)">NF discovers other NFs via NRF</span></td>
+            <td class="col-ai">GET /v1/models<br><span style="color:var(--muted)">List available models</span></td>
+          </tr>
+          <tr>
+            <td><span class="vb vb-put">PUT</span></td>
+            <td class="col-python">PUT /items/{id}<br><span style="color:var(--muted)">Full overwrite in dict</span></td>
+            <td class="col-5g">PUT /nnrf-nfm/v1/nf-instances/{id}<br><span style="color:var(--muted)">NF re-registers full profile to NRF</span></td>
+            <td class="col-ai">Full conversation history per call<br><span style="color:var(--muted)">Stateless = implicit PUT every time</span></td>
+          </tr>
+          <tr>
+            <td><span class="vb vb-patch">PATCH</span></td>
+            <td class="col-python">PATCH /items/{id}<br><span style="color:var(--muted)">Dict merge: {**old, **patch}</span></td>
+            <td class="col-5g">PATCH /nsmf-pdusession/v1/sm-contexts/{id}<br><span style="color:var(--muted)">Update QoS on existing PDU session</span></td>
+            <td class="col-ai">system prompt field<br><span style="color:var(--muted)">Patches model behavior without changing base model</span></td>
+          </tr>
+          <tr>
+            <td><span class="vb vb-delete">DELETE</span></td>
+            <td class="col-python">DELETE /items/{id}<br><span style="color:var(--muted)">del store[id]</span></td>
+            <td class="col-5g">DELETE /nsmf-pdusession/v1/sm-contexts/{id}<br><span style="color:var(--muted)">AMF tears down PDU session (phone disconnects)</span></td>
+            <td class="col-ai">No explicit DELETE<br><span style="color:var(--muted)">Stateless design — context forgotten automatically</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- STATUS CODES -->
+    <div class="doc-section" id="status-codes">
+      <h2>📬 Status Codes</h2>
+      <p>The server's one-number reply to every request. Learn these 6 and you'll understand 95% of REST responses.</p>
+      <div class="status-grid">
+        <div class="status-card">
+          <div class="status-code" style="color:var(--green)">200</div>
+          <div class="status-name">OK</div>
+          <div class="status-desc">GET or PATCH succeeded. Body contains the resource.</div>
+        </div>
+        <div class="status-card">
+          <div class="status-code" style="color:var(--green)">201</div>
+          <div class="status-name">Created</div>
+          <div class="status-desc">POST succeeded. New resource in the body.</div>
+        </div>
+        <div class="status-card">
+          <div class="status-code" style="color:var(--blue)">204</div>
+          <div class="status-name">No Content</div>
+          <div class="status-desc">DELETE succeeded. Nothing to return.</div>
+        </div>
+        <div class="status-card">
+          <div class="status-code" style="color:var(--yellow)">400</div>
+          <div class="status-name">Bad Request</div>
+          <div class="status-desc">Malformed request. Fix your body/headers.</div>
+        </div>
+        <div class="status-card">
+          <div class="status-code" style="color:var(--red)">404</div>
+          <div class="status-name">Not Found</div>
+          <div class="status-desc">ID doesn't exist in the store.</div>
+        </div>
+        <div class="status-card">
+          <div class="status-code" style="color:var(--red)">422</div>
+          <div class="status-name">Unprocessable</div>
+          <div class="status-desc">FastAPI: body failed Pydantic validation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENDPOINTS -->
+    <div class="doc-section" id="endpoints">
+      <h2>⚡ This Project's Endpoints</h2>
+      <p>The FastAPI server in <code style="color:var(--blue)">main.py</code> exposes these routes. Runs on port <strong>8004</strong>.</p>
+
+      <!-- POST -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span class="vb vb-post">POST</span>
+          <code style="color:var(--text);font-size:.88rem">/items</code>
+          <span style="font-size:.72rem;color:var(--muted)">→ 201 Created</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="tab(this,'ep-post','req')">Request body</button>
+          <button class="tab-btn" onclick="tab(this,'ep-post','res')">Response</button>
+          <button class="tab-btn" onclick="tab(this,'ep-post','py')">main.py</button>
+        </div>
+        <div id="ep-post-req" class="tab-pane active"><pre class="code">{
+  <span class="c-yellow">"name"</span>: <span class="c-green">"Widget A"</span>,          <span class="c-muted">// required</span>
+  <span class="c-yellow">"description"</span>: <span class="c-green">"Optional"</span>,  <span class="c-muted">// optional</span>
+  <span class="c-yellow">"price"</span>: <span class="c-blue">9.99</span>               <span class="c-muted">// required, float</span>
+}</pre></div>
+        <div id="ep-post-res" class="tab-pane"><pre class="code">{
+  <span class="c-yellow">"id"</span>: <span class="c-green">"a1b2c3d4"</span>,
+  <span class="c-yellow">"name"</span>: <span class="c-green">"Widget A"</span>,
+  <span class="c-yellow">"description"</span>: <span class="c-green">"Optional"</span>,
+  <span class="c-yellow">"price"</span>: <span class="c-blue">9.99</span>
+}</pre></div>
+        <div id="ep-post-py" class="tab-pane"><pre class="code"><span class="c-muted">@app.post("/items", status_code=201)</span>
+<span class="c-purple">def</span> <span class="c-blue">create_item</span>(item: ItemCreate):
+    item_id = <span class="c-blue">str</span>(uuid.uuid4())[:8]
+    <span class="c-green">store</span>[item_id] = {<span class="c-green">"id"</span>: item_id, **item.model_dump()}
+    <span class="c-purple">return</span> <span class="c-green">store</span>[item_id]</pre></div>
+      </div>
+
+      <!-- GET -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span class="vb vb-get">GET</span>
+          <code style="color:var(--text);font-size:.88rem">/items/{item_id}</code>
+          <span style="font-size:.72rem;color:var(--muted)">→ 200 OK · 404 Not Found</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="tab(this,'ep-get','curl')">curl</button>
+          <button class="tab-btn" onclick="tab(this,'ep-get','py')">main.py</button>
+        </div>
+        <div id="ep-get-curl" class="tab-pane active"><pre class="code">curl <span class="c-blue">http://127.0.0.1:8004/items/a1b2c3d4</span></pre></div>
+        <div id="ep-get-py" class="tab-pane"><pre class="code"><span class="c-muted">@app.get("/items/{item_id}")</span>
+<span class="c-purple">def</span> <span class="c-blue">get_item</span>(item_id: <span class="c-blue">str</span>):
+    <span class="c-purple">if</span> item_id <span class="c-purple">not in</span> <span class="c-green">store</span>:
+        <span class="c-purple">raise</span> HTTPException(status_code=<span class="c-blue">404</span>)
+    <span class="c-purple">return</span> <span class="c-green">store</span>[item_id]</pre></div>
+      </div>
+
+      <!-- PUT -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span class="vb vb-put">PUT</span>
+          <code style="color:var(--text);font-size:.88rem">/items/{item_id}</code>
+          <span style="font-size:.72rem;color:var(--muted)">→ 200 OK</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="tab(this,'ep-put','curl')">curl</button>
+          <button class="tab-btn" onclick="tab(this,'ep-put','py')">main.py</button>
+        </div>
+        <div id="ep-put-curl" class="tab-pane active"><pre class="code">curl -X <span class="c-orange">PUT</span> http://127.0.0.1:8004/items/a1b2c3d4 \
+  -H <span class="c-green">"Content-Type: application/json"</span> \
+  -d <span class="c-green">'{"name":"New Name","price":19.99}'</span></pre></div>
+        <div id="ep-put-py" class="tab-pane"><pre class="code"><span class="c-muted">@app.put("/items/{item_id}")</span>
+<span class="c-purple">def</span> <span class="c-blue">replace_item</span>(item_id: <span class="c-blue">str</span>, item: ItemCreate):
+    <span class="c-green">store</span>[item_id] = {<span class="c-green">"id"</span>: item_id, **item.model_dump()}
+    <span class="c-muted"># full overwrite — old entry gone</span>
+    <span class="c-purple">return</span> <span class="c-green">store</span>[item_id]</pre></div>
+      </div>
+
+      <!-- PATCH -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span class="vb vb-patch">PATCH</span>
+          <code style="color:var(--text);font-size:.88rem">/items/{item_id}</code>
+          <span style="font-size:.72rem;color:var(--muted)">→ 200 OK</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="tab(this,'ep-patch','curl')">curl</button>
+          <button class="tab-btn" onclick="tab(this,'ep-patch','py')">main.py</button>
+        </div>
+        <div id="ep-patch-curl" class="tab-pane active"><pre class="code">curl -X <span class="c-purple">PATCH</span> http://127.0.0.1:8004/items/a1b2c3d4 \
+  -H <span class="c-green">"Content-Type: application/json"</span> \
+  -d <span class="c-green">'{"price": 24.99}'</span>  <span class="c-muted"># only price changes</span></pre></div>
+        <div id="ep-patch-py" class="tab-pane"><pre class="code"><span class="c-muted">@app.patch("/items/{item_id}")</span>
+<span class="c-purple">def</span> <span class="c-blue">update_item</span>(item_id: <span class="c-blue">str</span>, item: ItemPatch):
+    existing = <span class="c-green">store</span>[item_id]
+    patch = {k: v <span class="c-purple">for</span> k, v <span class="c-purple">in</span> item.model_dump().items()
+             <span class="c-purple">if</span> v <span class="c-purple">is not</span> <span class="c-blue">None</span>}
+    <span class="c-green">store</span>[item_id] = {**existing, **patch}  <span class="c-muted"># dict merge</span>
+    <span class="c-purple">return</span> <span class="c-green">store</span>[item_id]</pre></div>
+      </div>
+
+      <!-- DELETE -->
+      <div style="margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span class="vb vb-delete">DELETE</span>
+          <code style="color:var(--text);font-size:.88rem">/items/{item_id}</code>
+          <span style="font-size:.72rem;color:var(--muted)">→ 204 No Content</span>
+        </div>
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="tab(this,'ep-del','curl')">curl</button>
+          <button class="tab-btn" onclick="tab(this,'ep-del','py')">main.py</button>
+        </div>
+        <div id="ep-del-curl" class="tab-pane active"><pre class="code">curl -X <span class="c-red">DELETE</span> http://127.0.0.1:8004/items/a1b2c3d4
+<span class="c-muted"># returns 204 — no body</span></pre></div>
+        <div id="ep-del-py" class="tab-pane"><pre class="code"><span class="c-muted">@app.delete("/items/{item_id}", status_code=204)</span>
+<span class="c-purple">def</span> <span class="c-blue">delete_item</span>(item_id: <span class="c-blue">str</span>):
+    <span class="c-purple">del</span> <span class="c-green">store</span>[item_id]
+    <span class="c-muted"># FastAPI returns 204 automatically</span></pre></div>
+      </div>
+    </div>
+
+    <!-- PYTHON TOPICS -->
+    <div class="doc-section" id="connect">
+      <h2>🐍 Python Topics → REST Concepts</h2>
+      <p>Every part of <code style="color:var(--blue)">main.py</code> connects to a topic from <a href="https://github.com/sagarmapv/Practice-Python-Project" target="_blank" style="color:var(--blue)">python-quiz-app</a>.</p>
+      <table class="connect-table">
+        <thead>
+          <tr><th>Quiz App Topic</th><th>Where it appears in main.py</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="topic-pill">Topic 3 — Control Flow</span></td>
+            <td><code style="color:var(--blue)">if item_id not in store: raise HTTPException(404)</code> — same <code>if/else</code> you practised, now guarding HTTP routes</td>
+          </tr>
+          <tr>
+            <td><span class="topic-pill">Topic 3 — Functions</span></td>
+            <td>Every endpoint is a function. <code style="color:var(--green)">def get_item(item_id: str)</code> — same concept, HTTP wrapper around it</td>
+          </tr>
+          <tr>
+            <td><span class="topic-pill">Topic 4 — Data Structures</span></td>
+            <td><code style="color:var(--yellow)">store: dict = {}</code> is the entire database. CRUD = dict assignment, lookup, overwrite, delete</td>
+          </tr>
+          <tr>
+            <td><span class="topic-pill">Topic 4 — Dict unpacking</span></td>
+            <td>PATCH merge: <code style="color:var(--purple)">{**existing, **patch}</code> — Topic 4's spread operator</td>
+          </tr>
+          <tr>
+            <td><span class="topic-pill">Topic 6 — I/O</span></td>
+            <td>JSON request body = structured <em>input</em>. JSON response = structured <em>output</em>. Same mental model as <code>input()</code> / <code>print()</code>, over HTTP</td>
+          </tr>
+          <tr>
+            <td><span class="topic-pill">Topic 7 — Exceptions</span></td>
+            <td><code style="color:var(--red)">raise HTTPException(status_code=404)</code> — same <code>raise</code> keyword, typed exception, framework handles the response</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LOCAL SETUP -->
+    <div class="doc-section" id="local-setup">
+      <h2>🛠 Run Locally</h2>
+      <p>The interactive journey runs in-browser (no server needed). To run the real FastAPI server:</p>
+      <div class="setup-step">
+        <div class="sn">1</div>
+        <div>
+          <h3>Clone</h3>
+          <pre class="code">git clone https://github.com/sagarmapv/use-python-build-rest.git
+cd use-python-build-rest</pre>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="sn">2</div>
+        <div>
+          <h3>Install</h3>
+          <p>Needs Python 3.10+</p>
+          <pre class="code">pip install -r requirements.txt</pre>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="sn">3</div>
+        <div>
+          <h3>Start server</h3>
+          <pre class="code">python main.py
+<span class="c-muted"># → Uvicorn running on http://127.0.0.1:8004</span></pre>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="sn">4</div>
+        <div>
+          <h3>Open client or Swagger UI</h3>
+          <pre class="code">open client.html         <span class="c-muted"># visual client</span>
+open http://127.0.0.1:8004/docs  <span class="c-muted"># Swagger auto-docs</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5G DEEP DIVE -->
+    <div class="doc-section" id="5g-detail">
+      <h2>📡 5G REST — Service Based Interface</h2>
+      <p>
+        The 5G core network (3GPP Release 15+) replaced legacy point-to-point signalling with
+        <strong>REST over HTTP/2</strong>. Every Network Function (NF) exposes a Service Based Interface (SBI) —
+        an OpenAPI spec, just like FastAPI generates automatically.
+      </p>
+      <p><strong>Key NFs and their REST endpoints:</strong></p>
+      <table class="worlds-table">
+        <thead><tr><th>NF</th><th>SBI Name</th><th>Example endpoint</th></tr></thead>
+        <tbody>
+          <tr><td>AMF</td><td>Namf</td><td>POST /namf-comm/v1/ue-contexts/{ueContextId}/n1-n2-messages</td></tr>
+          <tr><td>SMF</td><td>Nsmf</td><td>POST /nsmf-pdusession/v1/sm-contexts</td></tr>
+          <tr><td>NRF</td><td>Nnrf</td><td>GET /nnrf-disc/v1/nf-instances?target-nf-type=SMF</td></tr>
+          <tr><td>UDM</td><td>Nudm</td><td>GET /nudm-sdm/v1/{supi}/sm-data</td></tr>
+          <tr><td>PCF</td><td>Npcf</td><td>POST /npcf-smpolicycontrol/v1/sm-policies</td></tr>
+        </tbody>
+      </table>
+      <p>
+        When your phone connects to a 5G network, the AMF sends a <strong>POST</strong> to the SMF to create a PDU session —
+        exactly like <code style="color:var(--green)">POST /items</code> creates an item in this project.
+        Same verb. Same JSON body. Same 201 response.
+      </p>
+      <pre class="code"><span class="c-muted"># Your phone connects to 5G — this REST call happens automatically:</span>
+curl -X POST http://smf/nsmf-pdusession/v1/sm-contexts \
+  -H <span class="c-green">"Content-Type: application/json"</span> \
+  -d '{
+    <span class="c-yellow">"supi"</span>: <span class="c-green">"imsi-001011234567890"</span>,
+    <span class="c-yellow">"pduSessionId"</span>: <span class="c-blue">1</span>,
+    <span class="c-yellow">"dnn"</span>: <span class="c-green">"internet"</span>,
+    <span class="c-yellow">"sNssai"</span>: {<span class="c-yellow">"sst"</span>: <span class="c-blue">1</span>, <span class="c-yellow">"sd"</span>: <span class="c-green">"000001"</span>}
+  }'
+<span class="c-muted"># → 201 Created {smContextRef: "http://smf/.../1"}</span></pre>
+    </div>
+
+    <!-- AI API DEEP DIVE -->
+    <div class="doc-section" id="ai-detail">
+      <h2>🤖 AI API Calls — REST to Claude</h2>
+      <p>
+        The Claude API (and every major AI API) is a plain REST API. Every inference call is a
+        <strong>POST /messages</strong> — you send a conversation history, you get a completion back.
+        No special protocol. No SDK required. Just HTTP.
+      </p>
+      <pre class="code"><span class="c-muted"># Every AI call is just a POST:</span>
+curl -X POST https://api.anthropic.com/v1/messages \
+  -H <span class="c-green">"x-api-key: $ANTHROPIC_API_KEY"</span> \
+  -H <span class="c-green">"anthropic-version: 2023-06-01"</span> \
+  -H <span class="c-green">"Content-Type: application/json"</span> \
+  -d '{
+    <span class="c-yellow">"model"</span>: <span class="c-green">"claude-sonnet-4-6"</span>,
+    <span class="c-yellow">"max_tokens"</span>: <span class="c-blue">256</span>,
+    <span class="c-yellow">"messages"</span>: [{
+      <span class="c-yellow">"role"</span>: <span class="c-green">"user"</span>,
+      <span class="c-yellow">"content"</span>: <span class="c-green">"Explain REST in one sentence"</span>
+    }]
+  }'</pre>
+      <p>
+        The connection to this project: once you can build a FastAPI server, you can
+        <strong>call any API</strong> — including Claude's. The same <code style="color:var(--blue)">requests.post()</code>
+        Python call that hits <code>/items</code> can hit <code>/v1/messages</code>.
+        That's the gateway to the AI-For-All vision.
+      </p>
+      <pre class="code"><span class="c-muted"># Python — call Claude from your FastAPI server:</span>
+<span class="c-purple">import</span> requests
+
+response = requests.<span class="c-blue">post</span>(
+    <span class="c-green">"https://api.anthropic.com/v1/messages"</span>,
+    headers={
+        <span class="c-green">"x-api-key"</span>: api_key,
+        <span class="c-green">"anthropic-version"</span>: <span class="c-green">"2023-06-01"</span>,
+    },
+    json={
+        <span class="c-green">"model"</span>: <span class="c-green">"claude-sonnet-4-6"</span>,
+        <span class="c-green">"max_tokens"</span>: <span class="c-blue">256</span>,
+        <span class="c-green">"messages"</span>: [{<span class="c-green">"role"</span>: <span class="c-green">"user"</span>, <span class="c-green">"content"</span>: prompt}]
+    }
+)
+<span class="c-muted"># Same pattern as calling your own /items endpoint</span></pre>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  Part of the <strong>AI-For-All</strong> education wing ·
+  <a href="journey.html">Interactive Journey</a> ·
+  <a href="https://github.com/sagarmapv/use-python-build-rest" target="_blank">GitHub</a>
+</footer>
+
+<script>
+function tab(btn, group, pane) {
+  const container = btn.closest('.doc-section') || document;
+  container.querySelectorAll('[id^="' + group + '"]').forEach(p => p.classList.remove('active'));
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(group + '-' + pane).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
